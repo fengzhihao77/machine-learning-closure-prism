@@ -1,12 +1,12 @@
 # Machine Learning Closure for PRISM
 
-A local web application for a trained machine learning closure for polymer reference interaction site model (PRISM) integral equation theory. Supply chain length, interaction strength, and number density to calculate correlation functions and a structure factor.
+A local web application for a trained machine learning closure for polymer reference interaction site model (PRISM) integral equation theory. Use the Predictor to supply beads per chain, interaction strength, and bead number density and calculate correlation functions and a structure factor.
 
-**Software version: v1.0.6 — private.** The [repository](https://github.com/fengzhihao77/machine-learning-closure-prism) is private and requires access. No public release or hosted demo is available yet.
+**Software version: v1.0.6-rc.1 — private release candidate.** The [repository](https://github.com/fengzhihao77/machine-learning-closure-prism) is private and requires access. No public release or hosted demo is available yet.
 
-This version preserves the existing scientific engine and trained artifacts. Its package and software citation metadata use `1.0.6`; the historical `1.0.5` header inside the engine remains unchanged. See [CHANGELOG.md](CHANGELOG.md) for provenance.
+This version preserves the existing scientific engine and trained artifacts. The interface and software citation use `1.0.6-rc.1`; Python project metadata uses the equivalent normalized version `1.0.6rc1`. The historical `1.0.5` header inside the engine remains unchanged. See [CHANGELOG.md](CHANGELOG.md) for provenance.
 
-The author selected `v1.0.6` as the current software version. Earlier preparation labels and the existing historical tag remain recorded in the changelog; the version choice does not create a new tag or a public release.
+The author selected `v1.0.6-rc.1` as the current release-candidate version. Earlier preparation labels and the existing historical tag remain recorded in the changelog; the version choice does not create a new tag or a public release.
 
 ## Repository history
 
@@ -54,39 +54,39 @@ Open the local URL printed by Flask, normally [http://127.0.0.1:5000](http://127
 
 Use one prediction at a time. Each calculation overwrites the same result filenames, so this version is intended for a single local user and is not prepared for concurrent public requests.
 
-The launch command captures real stdout/stderr while keeping it visible in the launching terminal. **Live terminal** opens a popup showing up to 500 captured lines. It can be opened during calculation to inspect actual engine messages. Closing the popup hides the raw stream; per-model tracking continues until the current run’s final capture. With no active run, closing the popup stops polling. Raw terminal output is shown in this popup. A concise on-page summary reports the individual models’ observed convergence outcomes from the current run; it does not reproduce the raw log or invent iteration counts. It distinguishes partial ensemble convergence from all five models converging, and identifies unavailable or unverified status evidence.
+The launch command captures real stdout/stderr while keeping it visible in the launching terminal. **Live terminal** opens a popup showing up to 500 captured lines. It can be opened during calculation to inspect actual engine messages. Closing the popup hides the raw stream; per-model tracking continues until the current run’s final capture. With no active run, closing the popup stops polling. Raw terminal output is shown in this popup. A single on-page progress bar counts models with an observed terminal outcome in the current run: both convergence and failure count toward the five outcomes. The accompanying text reports convergence separately, including partial or unverified outcomes. This is not a measure of iterations, elapsed-time progress, scientific accuracy, or successful convergence of all five models.
 
 The existing Flask static route serves the generated log; no scientific code or route is modified. The viewer hides its own log requests and labels capture or connection failures explicitly. Output belongs to the whole local process and may include previous calculations. Existing engine messages report loading, model convergence, and exports; the disabled iteration-residual print statement is not enabled by this frontend. Running `python ML_closure.py` without capture leaves the popup clearly labeled as browser events. Terminal logs and generated predictions are ignored by Git. Keep this single-user local configuration private.
 
 ## Regression checks
 
-The latest **v1.0.6** model-status and loop-presentation refinement passed its three-state browser/model regression and focused presentation checks.
+The current **v1.0.6-rc.1** Predictor and single-bar refinement passed its three-state browser/model regression and focused presentation checks. Local Python version parsing also confirmed that `1.0.6-rc.1` and `1.0.6rc1` identify the same release candidate.
 
 Three state points were selected before execution with Python's `random.Random(20260913)`: independent draws of integer `N` in [20, 100], uniform `epsilon` in [0, 0.5], and uniform `rho` in [0.2, 0.8], with the latter two rounded to three decimals.
 
 | Case | N | epsilon | rho | Original complete check (s) | Current browser check (s) |
 | --- | --- | --- | --- | --- | --- |
-| 1 | 32 | 0.311 | 0.671 | 74.62 | 67.35 |
-| 2 | 49 | 0.407 | 0.701 | 65.30 | 66.83 |
-| 3 | 67 | 0.188 | 0.399 | 24.21 | 25.93 |
+| 1 | 32 | 0.311 | 0.671 | 74.62 | 65.30 |
+| 2 | 49 | 0.407 | 0.701 | 65.30 | 66.85 |
+| 3 | 67 | 0.188 | 0.399 | 24.21 | 25.44 |
 
 These are observed wall times for the complete checks, not a performance benchmark or evidence of a speed improvement.
 
-All three cases completed with all five ensemble folds converged and finite 2,048 × 7 exported arrays. All **43,008 numeric values** matched the frozen references exactly, with zero maximum absolute difference. All **15 original engine PNGs** matched byte-for-byte and pixel-for-pixel. Ordered inputs, retained values, completed numeric downloads, all 15 SVG source/sample records and current-figure downloads, and the original c(k) uncertainty download were checked. In every case, Model 0's reported convergence appeared on the page while the calculation was still running and the terminal popup was closed; final 5/5 outcomes matched the engine log. The combined numerical/source/browser audit passed **319/319 checks**.
+All three cases completed with all five ensemble folds converged and finite 2,048 × 7 exported arrays. All **43,008 numeric values** matched the frozen references exactly, with zero maximum absolute difference. All **15 original engine PNGs** matched byte-for-byte and pixel-for-pixel. Ordered inputs, retained values, completed numeric downloads, all 15 SVG source/sample records and current-figure downloads, and the original c(k) uncertainty download were checked. Live observed-outcome counts and the progress bar’s accessible value were verified during all three calculations, followed by final 5/5 outcomes matching the engine log. The combined audit passed **325/325 checks**.
 
-Focused interface checks passed **47/47**, and model-status parser/transport checks passed **72/72**. Those fixture checks cover partial, missing, stale, conflicting, and unavailable model-status evidence separately from the three real all-five-converged runs. The unchanged paper-style renderer retains its earlier **525/525** independent saved-data checks, including every source sample and plotted coordinate; those checks do not claim additional model runs.
+Focused interface checks passed **32/32**, and version normalization checks passed **5/5**. The unchanged model-status parser/transport retains its preceding **72/72** fixture checks, and the unchanged paper-style renderer retains its earlier **525/525** saved-data checks. Those separate checks do not claim additional real model runs or a real partial-ensemble case.
 
-Preservation checks passed: all **702** files in the recorded author-owned inventory retained their bytes and modification times. The **14** protected scientific files and original requirements, selected PNG/TGA sources, and sealed reference archive remained unchanged. All **20** frozen frontend files matched the checkout, three runtime copies, and preview. This evidence covers the three listed regression cases in the recorded environment, not new scientific accuracy or concurrent-hosting claims. See [VALIDATION.md](VALIDATION.md) for current and historical results, environment, and scope. Saved outputs and detailed audit records remain in the local review archive.
+Application preservation passed: the checkout and runtime scientific files, models, scalers, predictor, original requirements, artwork, and sealed reference archive remained unchanged. All **20** frozen frontend files matched the checkout, three runtime copies, and preview. A separate reorganization of the author’s original folder changed its path inventory; the complete 702-path snapshot is therefore not claimed unchanged. This release checkout retains its existing functioning engine paths. See [VALIDATION.md](VALIDATION.md) for the precise scope and historical results. Saved outputs and detailed audit records remain in the local review archive.
 
-## Inputs and results
+## Predictor inputs and results
 
 | Input | Meaning | Existing interface guidance |
 | --- | --- | --- |
-| `N` | Number of monomers per chain | Integers, 20–100 |
+| `N` | Number of beads per chain | Integers, 20–100 |
 | `epsilon` | Interaction well depth, ε, in kBT | 0.0–0.5 |
-| `rho` | Monomer number density, ρ, in σ⁻³ | 0.2–0.8 |
+| `rho` | Bead number density, ρ, in σ⁻³ | 0.2–0.8 |
 
-Inputs use Lennard–Jones reduced units with bead diameter σ and the study's fixed reduced temperature T*=1. The reduced density is physical monomer number density multiplied by σ³. An interaction input of ε = 0 selects purely repulsive WCA interactions. These ranges reproduce the existing interface guidance; they do not establish a new applicability domain or guarantee convergence. No input-unit conversion is applied by the frontend.
+Inputs use Lennard–Jones reduced units with bead diameter σ and the study's fixed reduced temperature T*=1. The reduced density is physical bead number density multiplied by σ³. An interaction input of ε = 0 selects purely repulsive WCA interactions. These ranges reproduce the existing interface guidance; they do not establish a new applicability domain or guarantee convergence. No input-unit conversion is applied by the frontend.
 
 Successful calculations write five PNG plots and `pred_data.txt` under `static/pred_results/`. The data file contains 2,048 rows for the web defaults and seven columns:
 

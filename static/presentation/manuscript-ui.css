@@ -50,14 +50,25 @@ details[data-fold-animating]{overflow:hidden}.units-note{font-size:10px;line-hei
 #calculation-overlay p{color:var(--muted);font-size:12px;max-width:440px;margin-top:8px}
 #calculation-overlay .elapsed{margin-top:12px;color:var(--gold-deep)}
 #conceptual-note{font-size:10px;line-height:1.7;color:var(--muted);max-width:480px;text-align:center;margin-top:18px}
+/* The connected track measures captured model outcomes, not iterations or time. */
 .model-run-summary{margin:0 0 18px;padding:14px 0;border-top:1px solid var(--line)}
-#model-status-list{display:grid;grid-template-columns:repeat(5,minmax(0,1fr));gap:8px;list-style:none;padding:0;margin:0}
-#model-status-list>li{min-width:0;display:flex;flex-direction:column;gap:5px;padding:9px 8px;border:1px solid var(--line);border-radius:3px;color:var(--muted);font-size:10px;line-height:1.45;background:var(--soft)}
+#model-progress-count{font-size:10px;line-height:1.5;color:var(--muted);margin:0 0 14px;font-variant-numeric:tabular-nums}
+#model-progress{position:relative;width:100%;height:3px;background:var(--line);border-radius:2px}
+#model-progress-fill{position:absolute;inset:0 auto 0 0;width:0;background:var(--gold);border-radius:2px;transition:width .55s cubic-bezier(.22,.61,.36,1)}
+#model-progress-outcomes{position:absolute;inset:0;overflow:hidden;border-radius:2px}
+#model-progress-outcomes>span{position:absolute;top:0;bottom:0;width:20%;background:transparent}
+#model-progress-outcomes>span[data-state=failed]{background:var(--error)}
+#model-status-list{display:grid;grid-template-columns:repeat(5,minmax(0,1fr));gap:0;list-style:none;padding:0;margin:0}
+#model-status-list>li{position:relative;min-width:0;display:flex;flex-direction:column;align-items:center;gap:4px;padding:14px 4px 0;color:var(--muted);font-size:9px;line-height:1.5;text-align:center;background:none;border:0;border-radius:0}
+#model-status-list>li::before{content:"";position:absolute;top:-5px;left:calc(50% - 3.5px);height:7px;width:7px;border:1px solid var(--muted);border-radius:50%;background:var(--surface)}
 #model-status-list>li strong{font-size:10px;font-weight:550;color:var(--ink)}
-#model-status-list>li[data-state=loading]{border-color:var(--gold);color:var(--gold-deep)}
-#model-status-list>li[data-state=converged]{border-color:var(--success);color:var(--success)}
-#model-status-list>li[data-state=failed]{border-color:var(--error);color:var(--error)}
-#model-status-list>li[data-state=unavailable],#model-status-list>li[data-state=unconfirmed]{border-style:dashed;color:var(--muted)}
-#model-status-note{font-size:10px;line-height:1.7;color:var(--muted);margin-top:10px}
+#model-status-list>li[data-state=converged]{color:var(--gold-deep)}
+#model-status-list>li[data-state=converged]::before{background:var(--gold);border-color:var(--gold)}
+#model-status-list>li[data-state=failed]{color:var(--error)}
+#model-status-list>li[data-state=failed]::before{background:var(--error);border-color:var(--error);border-radius:1px;transform:rotate(45deg)}
+#model-status-list>li[data-state=unconfirmed]::before{border-style:dashed}
+#model-status-note{font-size:10px;line-height:1.7;color:var(--muted);margin-top:12px}
+#model-progress[data-unknown=true] #model-progress-fill{transition:none}
+@media(prefers-reduced-motion:reduce){#model-progress-fill{transition:none}}
 @media(max-width:850px){#calculation-view{min-height:370px;padding:27px 20px}#calculation-visual{max-width:570px}}
-@media(max-width:650px){#calculation-view{min-height:310px;padding:24px 12px}#calculation-visual .concept-node text{font-size:18px}#calculation-visual .concept-node .concept-math{font-size:21px}#calculation-overlay{margin-top:18px}#calculation-overlay h4{font-size:20px}#calculation-overlay p{font-size:11px}#conceptual-note{font-size:9px;margin-top:16px}#model-status-list{grid-template-columns:repeat(3,minmax(0,1fr));gap:7px}#model-status-list>li{padding:8px;font-size:10px}#model-status-note{font-size:9px}.model-run-summary{padding-top:12px;margin-bottom:15px}}
+@media(max-width:650px){#calculation-view{min-height:310px;padding:24px 12px}#calculation-visual .concept-node text{font-size:18px}#calculation-visual .concept-node .concept-math{font-size:21px}#calculation-overlay{margin-top:18px}#calculation-overlay h4{font-size:20px}#calculation-overlay p{font-size:11px}#conceptual-note{font-size:9px;margin-top:16px}#model-status-list>li{padding:13px 3px 0;font-size:9px}#model-status-list>li strong{font-size:9px}#model-progress-count{font-size:9px}#model-status-note{font-size:9px}.model-run-summary{padding-top:12px;margin-bottom:15px}}

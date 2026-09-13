@@ -2,7 +2,7 @@
 # No build backend, wheel, CLI entry point, or pip-installable package is declared.
 [project]
 name = "machine-learning-closure-prism"
-version = "1.0.6"
+version = "1.0.6rc1"
 description = "Machine learning closure for polymer reference interaction site model (PRISM) integral equation theory"
 readme = "README.md"
 requires-python = "==3.9.23"

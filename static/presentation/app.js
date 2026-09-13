@@ -53,25 +53,56 @@
     const section = byId('model-run-summary');
     section.hidden = !modelStatus || state === 'ready';
     if (modelStatus) {
+      const progress = byId('model-progress');
+      const fill = byId('model-progress-fill');
+      const observed = modelStatus.observedCount;
+      const unavailable = modelStatus.source === 'unavailable' || (modelStatus.phase === 'complete' && !modelStatus.anchored);
+      const unknown = unavailable && observed === 0;
+      // Only captured outcomes advance this track; loading and elapsed time never do.
+      // A new run starts empty without animating backward from the previous run.
+      if (section.dataset.runId !== String(modelStatus.runId)) {
+        fill.style.transition = 'none';
+        fill.style.width = '0%';
+        void fill.offsetWidth;
+        fill.style.removeProperty('transition');
+      }
+      section.dataset.runId = String(modelStatus.runId);
+      progress.dataset.unknown = String(unknown);
+      if (unknown) progress.removeAttribute('aria-valuenow');
+      else progress.setAttribute('aria-valuenow', String(observed));
+      fill.style.width = `${observed * 20}%`;
+      const remaining = modelStatus.pending.length;
+      const finalOrUnavailable = unavailable || modelStatus.phase === 'complete';
+      const outcomeText = `${observed} of 5 model outcomes reported`;
+      byId('model-progress-count').textContent = unknown ? 'Model outcomes unavailable' : outcomeText;
+      progress.setAttribute('aria-valuetext', `${unknown ? 'Model outcomes unavailable' : outcomeText}; ${modelStatus.converged.length} converged; ${modelStatus.failed.length} did not converge; ${remaining} ${finalOrUnavailable ? 'unconfirmed' : 'awaiting an outcome'}.`);
       section.dataset.convergedCount = String(modelStatus.converged.length);
-      section.dataset.observedCount = String(modelStatus.observedCount);
+      section.dataset.observedCount = String(observed);
       section.dataset.source = modelStatus.source;
       section.dataset.phase = modelStatus.phase;
       const list = byId('model-status-list');
       const unconfirmed = modelStatus.source === 'unavailable' || modelStatus.phase === 'complete';
+      const segments = [];
       const items = [0, 1, 2, 3, 4].map((id) => {
         const item = document.createElement('li');
         const outcome = modelStatus.converged.includes(id) ? 'converged' : modelStatus.failed.includes(id) ? 'failed' : unconfirmed ? 'unconfirmed' : 'pending';
         item.dataset.model = String(id);
         item.dataset.state = outcome;
+        const segment = document.createElement('span');
+        segment.dataset.progressModel = String(id);
+        segment.dataset.state = outcome;
+        segment.style.left = `${id * 20}%`;
+        segments.push(segment);
         const identity = document.createElement('strong');
         identity.textContent = `Model ${id}`;
         const label = document.createElement('span');
-        label.textContent = { converged: 'Converged', failed: 'Did not converge', unconfirmed: 'Unconfirmed', pending: 'Awaiting result' }[outcome];
+        label.textContent = { converged: 'Converged', failed: 'Failed', unconfirmed: 'Unknown', pending: 'Pending' }[outcome];
+        item.title = `Model ${id}: ` + { converged: 'converged', failed: 'did not converge', unconfirmed: 'outcome unconfirmed', pending: 'awaiting result' }[outcome];
         item.append(identity, label);
         return item;
       });
       list.replaceChildren(...items);
+      byId('model-progress-outcomes').replaceChildren(...segments);
       byId('model-status-note').textContent = modelStatus.note;
     }
     const convergence = convergenceText();

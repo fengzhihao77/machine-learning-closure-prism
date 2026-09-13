@@ -1,6 +1,14 @@
 # Changelog
 
-## 1.0.6 — 2026-09-13 (current software version; private preparation)
+## 1.0.6-rc.1 — current private release candidate
+
+- Adopted the author’s requested `1.0.6-rc.1` interface/citation label and equivalent Python metadata version `1.0.6rc1`. The existing historical tag and scientific component headers are unchanged; no new tag or public release is created.
+- Named the calculation section “Predictor” and used beads per chain and bead number density in current input explanations.
+- Replaced separate model cards with a single bar counting observed model outcomes, with reported convergence summarized separately. Failure outcomes count toward the bar; unavailable evidence is not inferred from the global response.
+- Passed 325/325 checks from the same three actual browser/model runs: all 43,008 numeric values and 15 original PNGs matched the frozen references exactly. Live observed-outcome counts, accessible progress values, and final 5/5 outcomes matched the current engine evidence.
+- Passed 32/32 focused UI checks and 5/5 version checks. Application files, artwork, sealed reference outputs, and all 20 frozen frontend files passed preservation checks. The separately reorganized author-folder inventory is not claimed wholly unchanged; the release checkout keeps its working engine paths. Earlier results below retain their original version and test scope.
+
+## 1.0.6 — 2026-09-13 (historical private preparation)
 
 ### Model-status and loop refinement
 
