@@ -14,7 +14,19 @@ python3.9 -m venv "${env_dir}"
 # Chrome for Testing publishes matching browser/driver assets. These files are
 # installation tools outside the scientific engine and outside the repository.
 sudo apt-get update
-sudo apt-get install -y --no-install-recommends libnss3 libatk-bridge2.0-0 libx11-xcb1 libxcomposite1 libxdamage1 libxfixes3 libxrandr2 libgbm1 libxkbcommon0 libasound2t64 fonts-liberation
+sudo apt-get install -y --no-install-recommends libnss3 libatk-bridge2.0-0 libx11-xcb1 libxcomposite1 libxdamage1 libxfixes3 libxrandr2 libgbm1 libxkbcommon0 libasound2t64 libcups2t64 libpango-1.0-0 libcairo2 fonts-liberation openssh-server
 "${env_dir}/bin/python" "${project_dir}/deploy/install-browser.py"
+# Selenium 4.12 discovers stable Chrome at this canonical Linux path.
+# Preserve any unrelated installation rather than replacing it.
+browser_dir="${ML_CLOSURE_BROWSER_DIR:-${HOME}/.local/ml-closure-browser}"
+chrome_target="$(readlink -f -- "${browser_dir}/chrome-linux64/chrome")"
+if [[ -e /usr/bin/google-chrome || -L /usr/bin/google-chrome ]]; then
+  if [[ "$(readlink -f -- /usr/bin/google-chrome)" != "${chrome_target}" ]]; then
+    echo "An unrelated /usr/bin/google-chrome already exists; it was not changed." >&2
+    exit 1
+  fi
+else
+  sudo ln -s -- "${chrome_target}" /usr/bin/google-chrome
+fi
 echo "Setup complete. Start with: bash deploy/start-codespace.sh"
 echo "Keep forwarded port 7860 private; stop the codespace when finished."
