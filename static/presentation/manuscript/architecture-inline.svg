@@ -31,20 +31,20 @@
 <text x="308" y="253" font-size="24" text-anchor="middle" class="">QHO</text>
 <text x="308" y="281" font-size="24" text-anchor="middle" class="">encode</text>
 <text x="483" y="28" font-size="21" text-anchor="middle" class="arch-accent">QHO coeffs</text>
-<rect x="430" y="47" width="106" height="34" class="arch-frequency"/>
-<text x="483" y="72" font-size="23" text-anchor="middle" class="arch-frequency-label">w</text>
-<rect x="430" y="93" width="106" height="34" class="arch-coeff"/>
-<text x="483" y="118" font-size="23" text-anchor="middle" class="">C<tspan baseline-shift="sub" font-size="65%">0</tspan></text>
-<rect x="430" y="171" width="106" height="34" class="arch-coeff"/>
-<text x="483" y="196" font-size="23" text-anchor="middle" class="">C<tspan baseline-shift="sub" font-size="65%">59</tspan></text>
-<rect x="430" y="219" width="106" height="34" class="arch-state"/>
-<text x="483" y="244" font-size="23" text-anchor="middle" class="">N</text>
-<rect x="430" y="262" width="106" height="34" class="arch-state"/>
-<text x="483" y="287" font-size="23" text-anchor="middle" class="">ε</text>
-<rect x="430" y="305" width="106" height="34" class="arch-state"/>
-<text x="483" y="330" font-size="23" text-anchor="middle" class="">ρ</text>
-<rect x="430" y="348" width="106" height="34" class="arch-state"/>
-<text x="483" y="373" font-size="23" text-anchor="middle" class="">LJ</text>
+<rect id="ml-arch-labelbox-01" x="430" y="47" width="106" height="38" class="arch-frequency"/>
+<text id="ml-arch-boxlabel-01" data-label-box="ml-arch-labelbox-01" x="483" y="72.992" font-size="20" text-anchor="middle" class="arch-frequency-label">w</text>
+<rect id="ml-arch-labelbox-02" x="430" y="93" width="106" height="38" class="arch-coeff"/>
+<text id="ml-arch-boxlabel-02" data-label-box="ml-arch-labelbox-02" x="483" y="115.397" font-size="19" text-anchor="middle" class="">C<tspan baseline-shift="sub" font-size="65%">0</tspan></text>
+<rect id="ml-arch-labelbox-03" x="430" y="171" width="106" height="38" class="arch-coeff"/>
+<text id="ml-arch-boxlabel-03" data-label-box="ml-arch-labelbox-03" x="483" y="193.397" font-size="19" text-anchor="middle" class="">C<tspan baseline-shift="sub" font-size="65%">59</tspan></text>
+<rect id="ml-arch-labelbox-04" x="430" y="219" width="106" height="38" class="arch-state"/>
+<text id="ml-arch-boxlabel-04" data-label-box="ml-arch-labelbox-04" x="483" y="244.803" font-size="20" text-anchor="middle" class="">N</text>
+<rect id="ml-arch-labelbox-05" x="430" y="262" width="106" height="38" class="arch-state"/>
+<text id="ml-arch-boxlabel-05" data-label-box="ml-arch-labelbox-05" x="483" y="287.803" font-size="20" text-anchor="middle" class="">ε</text>
+<rect id="ml-arch-labelbox-06" x="430" y="305" width="106" height="38" class="arch-state"/>
+<text id="ml-arch-boxlabel-06" data-label-box="ml-arch-labelbox-06" x="483" y="330.803" font-size="20" text-anchor="middle" class="">ρ</text>
+<rect id="ml-arch-labelbox-07" x="430" y="348" width="106" height="38" class="arch-state"/>
+<text id="ml-arch-boxlabel-07" data-label-box="ml-arch-labelbox-07" x="483" y="373.803" font-size="20" text-anchor="middle" class="">LJ</text>
 <text x="483" y="153" font-size="30" text-anchor="middle" class="arch-accent">⋮</text>
 <text x="483" y="406" font-size="17" text-anchor="middle" class="arch-accent">state point</text>
 <path d="M568 215H691" class="arch-link" marker-end="url(#ml-arch-arrow)"/>
@@ -52,25 +52,25 @@
 <rect x="761" y="33" width="225" height="310" rx="31" class="arch-card"/>
 <rect x="744" y="48" width="225" height="310" rx="31" class="arch-card"/>
 <rect x="727" y="63" width="225" height="310" rx="31" class="arch-card"/>
-<rect x="710" y="78" width="225" height="310" rx="31" class="arch-card"/>
-<text x="822.5" y="181" font-size="25" text-anchor="middle" class="">Feed-forward</text>
-<text x="822.5" y="213" font-size="27" text-anchor="middle" class="">NN</text>
-<text x="822.5" y="287" font-size="17" text-anchor="middle" class="arch-muted">65 → 65 → 65 → 65 → 61</text>
-<text x="822.5" y="345" font-size="20" text-anchor="middle" class="arch-muted">ReLU × 3</text>
+<rect id="ml-arch-networkbox" x="710" y="78" width="225" height="310" rx="31" class="arch-card"/>
+<text id="ml-arch-networklabel-1" data-label-box="ml-arch-networkbox" x="822.5" y="181" font-size="25" text-anchor="middle" class="">Feed-forward</text>
+<text id="ml-arch-networklabel-2" data-label-box="ml-arch-networkbox" x="822.5" y="213" font-size="27" text-anchor="middle" class="">NN</text>
+<text id="ml-arch-networklabel-3" data-label-box="ml-arch-networkbox" x="822.5" y="287" font-size="17" text-anchor="middle" class="arch-muted">65 → 65 → 65 → 65 → 61</text>
+<text id="ml-arch-networklabel-4" data-label-box="ml-arch-networkbox" x="822.5" y="345" font-size="20" text-anchor="middle" class="arch-muted">ReLU × 3</text>
 <path d="M1020 215H1130" class="arch-link" marker-end="url(#ml-arch-arrow)"/>
 <text x="1210" y="28" font-size="21" text-anchor="middle" class="arch-accent">QHO coeffs</text>
-<rect x="1157" y="47" width="106" height="34" class="arch-frequency"/>
-<text x="1210" y="72" font-size="23" text-anchor="middle" class="arch-frequency-label">w</text>
-<rect x="1157" y="94" width="106" height="34" class="arch-coeff"/>
-<text x="1210" y="119" font-size="23" text-anchor="middle" class="">C<tspan baseline-shift="sub" font-size="65%">0</tspan></text>
-<rect x="1157" y="141" width="106" height="34" class="arch-coeff"/>
-<text x="1210" y="166" font-size="23" text-anchor="middle" class="">C<tspan baseline-shift="sub" font-size="65%">1</tspan></text>
-<rect x="1157" y="188" width="106" height="34" class="arch-coeff"/>
-<text x="1210" y="213" font-size="23" text-anchor="middle" class="">C<tspan baseline-shift="sub" font-size="65%">2</tspan></text>
-<rect x="1157" y="282" width="106" height="34" class="arch-coeff"/>
-<text x="1210" y="307" font-size="23" text-anchor="middle" class="">C<tspan baseline-shift="sub" font-size="65%">58</tspan></text>
-<rect x="1157" y="329" width="106" height="34" class="arch-coeff"/>
-<text x="1210" y="354" font-size="23" text-anchor="middle" class="">C<tspan baseline-shift="sub" font-size="65%">59</tspan></text>
+<rect id="ml-arch-labelbox-08" x="1157" y="47" width="106" height="38" class="arch-frequency"/>
+<text id="ml-arch-boxlabel-08" data-label-box="ml-arch-labelbox-08" x="1210" y="72.992" font-size="20" text-anchor="middle" class="arch-frequency-label">w</text>
+<rect id="ml-arch-labelbox-09" x="1157" y="94" width="106" height="38" class="arch-coeff"/>
+<text id="ml-arch-boxlabel-09" data-label-box="ml-arch-labelbox-09" x="1210" y="116.397" font-size="19" text-anchor="middle" class="">C<tspan baseline-shift="sub" font-size="65%">0</tspan></text>
+<rect id="ml-arch-labelbox-10" x="1157" y="141" width="106" height="38" class="arch-coeff"/>
+<text id="ml-arch-boxlabel-10" data-label-box="ml-arch-labelbox-10" x="1210" y="163.397" font-size="19" text-anchor="middle" class="">C<tspan baseline-shift="sub" font-size="65%">1</tspan></text>
+<rect id="ml-arch-labelbox-11" x="1157" y="188" width="106" height="38" class="arch-coeff"/>
+<text id="ml-arch-boxlabel-11" data-label-box="ml-arch-labelbox-11" x="1210" y="210.397" font-size="19" text-anchor="middle" class="">C<tspan baseline-shift="sub" font-size="65%">2</tspan></text>
+<rect id="ml-arch-labelbox-12" x="1157" y="282" width="106" height="38" class="arch-coeff"/>
+<text id="ml-arch-boxlabel-12" data-label-box="ml-arch-labelbox-12" x="1210" y="304.397" font-size="19" text-anchor="middle" class="">C<tspan baseline-shift="sub" font-size="65%">58</tspan></text>
+<rect id="ml-arch-labelbox-13" x="1157" y="329" width="106" height="38" class="arch-coeff"/>
+<text id="ml-arch-boxlabel-13" data-label-box="ml-arch-labelbox-13" x="1210" y="351.397" font-size="19" text-anchor="middle" class="">C<tspan baseline-shift="sub" font-size="65%">59</tspan></text>
 <text x="1210" y="260" font-size="30" text-anchor="middle" class="arch-accent">⋮</text>
 <svg x="1300" y="60" width="135" height="126" viewBox="0 106.065 750 590.445"><rect width="750" height="1500" fill="var(--gold-deep,#765d27)" mask="url(#ml-arch-decode-mask)"/></svg>
 <path d="M1300 215H1435" class="arch-link" marker-end="url(#ml-arch-arrow)"/>

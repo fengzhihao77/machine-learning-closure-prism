@@ -1,6 +1,14 @@
 # Changelog
 
-## Unreleased — private candidate refinements
+## 1.0.6 — 2026-09-13 (current software version; private preparation)
+
+- Adopted the author's selected software version `1.0.6` for current project metadata, software citation, documentation, and interface. This supersedes the earlier `1.1.0rc1` preparation label.
+- Preserved the scientific source and trained artifacts, including the engine's historical `1.0.5` header and original dependency specification.
+- Retained the existing repository, its 2023 creation record, original commits, and historical `v1.1.0-rc.1` tag. No `v1.0.6` tag, replacement tag, package publication, or public release is created by this version change.
+- Verified the current version, single preprint link, and diagram-label spacing: 36/36 focused checks passed, including 168 text-to-box measurements across two themes and four viewports.
+- Repeated the same three actual browser/model runs: all 43,008 numeric values and all 15 original PNGs matched the frozen baselines exactly. SVG samples/downloads, the original c(k) uncertainty download, and real inline terminal output were verified; the combined audit passed 304/304 checks. Application preservation checks passed. Earlier results below remain records of the revisions actually checked.
+
+## Earlier private frontend refinements — 2026-09-13
 
 - Added manuscript Figures 1 and 2 as exact image copies with full-resolution viewing, a QHO-inspired presentation mark, preprint links, and three selectable conceptual animations. Their timing does not represent solver progress.
 - Added paper-style SVG plots using every exported sample without smoothing, resampling, or unit conversion. SVG provenance records the source-data hash and all sample pairs. The original engine PNGs remain available; c(k) shows only the mean because its source table contains no fold uncertainty.
@@ -8,9 +16,9 @@
 - Repeated the same three actual browser/model regressions: all 43,008 numeric values had zero maximum difference, and all 15 original PNGs remained identical in bytes and pixels. The combined audit passed 304/304 checks. Real terminal output was observed before completion in all three runs.
 - Passed 525 independent saved-data SVG checks and 56 mocked UI checks. After the full runs, a terminal-dialog close/reopen race was fixed and verified by 21 focused browser checks without rerunning the model. See [VALIDATION.md](VALIDATION.md) for the sequence and scope.
 
-These refinements follow the existing `v1.1.0-rc.1` tag. The tag is retained at its original commit; no replacement tag or public release is implied.
+These refinements followed the historical `v1.1.0-rc.1` tag. The tag remains at its original commit; no replacement tag or public release is implied.
 
-## 1.1.0-rc.1 — 2026-09-13 (private candidate)
+## 1.1.0-rc.1 — 2026-09-13 (historical private candidate)
 
 - Prepared the current application in the renamed private `machine-learning-closure-prism` repository, retaining its February 2, 2023 creation date and existing Git history.
 - Added source setup guidance, project and citation metadata, contribution boundaries, and a record of imported file checksums and filesystem timestamps.
@@ -22,10 +30,10 @@ These refinements follow the existing `v1.1.0-rc.1` tag. The tag is retained at 
 - Documented the existing saved-scaler/runtime scikit-learn version warning without modifying the scalers or original dependency pins.
 - Corrected the initial illustration's captions and accessible text while preserving its image. The final frontend passed 30/30 mocked/native checks and a saved-real-output replay verifying the numeric download and all five displayed plot bytes; that final replay did not rerun the model.
 
-Python metadata uses `1.1.0rc1`; the private candidate tag is `v1.1.0-rc.1`. This candidate does not establish a public release or expand the model's scientific accuracy claims.
+Python metadata at this stage used `1.1.0rc1`; its historical private candidate tag remains `v1.1.0-rc.1`. This preparation stage did not establish a public release or expand the model's scientific accuracy claims.
 
 ## Earlier development
 
-The author dates the beginning of development to late 2020; alpha and beta work preceded this candidate. Those stages were not formal GitHub releases.
+The author dates the beginning of development to late 2020; alpha and beta work preceded this release preparation. Those stages were not formal GitHub releases.
 
 The preserved engine header records `1.0.0` on June 7, 2023; `1.0.1` on July 13; `1.0.2` on July 20; `1.0.3` on August 30; `1.0.4` on September 4; and `1.0.5` on September 14, 2023. These are source-header records, not reconstructed release tags. The imported files also have later observed modification times, recorded separately in `SOURCE_PROVENANCE.json`.

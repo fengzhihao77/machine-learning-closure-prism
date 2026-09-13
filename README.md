@@ -2,23 +2,23 @@
 
 A local web application for a trained machine learning closure for polymer reference interaction site model (PRISM) integral equation theory. Supply chain length, interaction strength, and number density to calculate correlation functions and a structure factor.
 
-**Candidate version: v1.1.0-rc.1 — private candidate.** The [repository](https://github.com/fengzhihao77/machine-learning-closure-prism) is private and requires access. No public release or hosted demo is available yet. The current frontend passed three actual browser runs against saved pre-redesign baselines, with identical numerical outputs and original PNGs. Real terminal messages were visible inline before every calculation completed.
+**Software version: v1.0.6 — private.** The [repository](https://github.com/fengzhihao77/machine-learning-closure-prism) is private and requires access. No public release or hosted demo is available yet.
 
-This candidate preserves the existing scientific engine and trained artifacts. Its package metadata version is `1.1.0rc1`; the historical `1.0.5` header inside the engine remains unchanged. See [CHANGELOG.md](CHANGELOG.md) for provenance.
+This version preserves the existing scientific engine and trained artifacts. Its package and software citation metadata use `1.0.6`; the historical `1.0.5` header inside the engine remains unchanged. See [CHANGELOG.md](CHANGELOG.md) for provenance.
 
-`rc.1` means **release candidate 1**: a version prepared for review before the planned stable `v1.1.0` release. The interface spells out that status.
+The author selected `v1.0.6` as the current software version. Earlier preparation labels and the existing historical tag remain recorded in the changelog; the version choice does not create a new tag or a public release.
 
 ## Repository history
 
-This is the original `PRISM_Deep_Closure` repository, renamed while preserving GitHub repository ID `596750311` and its creation record: **February 2, 2023, 21:16:54 UTC**. The candidate commit preserves all eight original 2023 commits as ancestors.
+This is the original `PRISM_Deep_Closure` repository, renamed while preserving GitHub repository ID `596750311` and its creation record: **February 2, 2023, 21:16:54 UTC**. The main-branch history preserves all eight original 2023 commits as ancestors.
 
 [Browse the complete main-branch history](https://github.com/fengzhihao77/machine-learning-closure-prism/commits/main/), [open the first commit from February 2, 2023](https://github.com/fengzhihao77/machine-learning-closure-prism/commit/59f0511fe413a3d8a57b81a535feaf9b40b7c005), or [browse the original snapshot](https://github.com/fengzhihao77/machine-learning-closure-prism/tree/59f0511fe413a3d8a57b81a535feaf9b40b7c005). These links require repository access while it is private.
 
-The current files show recent commit dates because they were imported for this candidate. A file's history covers that file path; the repository history includes the older scripts and filenames too. Obsolete scripts were removed from the current tree, and their earlier versions remain in the preserved commits.
+The current files show recent commit dates because of their import and presentation revisions during release preparation. A file's history covers that file path; the repository history includes the older scripts and filenames too. Obsolete scripts were removed from the current tree, and their earlier versions remain in the preserved commits.
 
 ## Local setup
 
-Use **Python 3.9.23**. On **macOS ARM64**, install the tested [requirements-macos-arm64.lock.txt](requirements-macos-arm64.lock.txt), which records all 105 installed distributions, including the exact original dependency pins. The unchanged [requirements.txt](requirements.txt) remains the direct dependency specification. The candidate is run from its source directory; `pyproject.toml` supplies project metadata and does not define a supported `pip install .` package.
+Use **Python 3.9.23**. On **macOS ARM64**, install the tested [requirements-macos-arm64.lock.txt](requirements-macos-arm64.lock.txt), which records all 105 installed distributions, including the exact original dependency pins. The unchanged [requirements.txt](requirements.txt) remains the direct dependency specification. The application runs from its source directory; `pyproject.toml` supplies project metadata and does not define a supported `pip install .` package.
 
 With [uv](https://docs.astral.sh/uv/getting-started/installation/) installed, start inside this checkout:
 
@@ -60,23 +60,23 @@ The existing Flask static route serves the generated log; no scientific code or 
 
 ## Regression checks
 
-The current inline-terminal, standard-plot, and diagram refinements passed the full three-state regression on September 13, 2026.
+The current **v1.0.6** interface, metadata, citation link, and diagram-label adjustments passed the full three-state regression on September 13, 2026.
 
 Three state points were selected before execution with Python's `random.Random(20260913)`: independent draws of integer `N` in [20, 100], uniform `epsilon` in [0, 0.5], and uniform `rho` in [0.2, 0.8], with the latter two rounded to three decimals.
 
 | Case | N | epsilon | rho | Original complete check (s) | Current browser check (s) |
 | --- | --- | --- | --- | --- | --- |
-| 1 | 32 | 0.311 | 0.671 | 74.62 | 64.0 |
-| 2 | 49 | 0.407 | 0.701 | 65.30 | 65.1 |
-| 3 | 67 | 0.188 | 0.399 | 24.21 | 26.38 |
+| 1 | 32 | 0.311 | 0.671 | 74.62 | 66.73 |
+| 2 | 49 | 0.407 | 0.701 | 65.30 | 65.65 |
+| 3 | 67 | 0.188 | 0.399 | 24.21 | 25.85 |
 
 These are observed wall times for the complete checks, not a performance benchmark or evidence of a speed improvement.
 
 All three cases completed with all five ensemble folds converged and finite 2,048 × 7 exported arrays. All **43,008 numeric values** matched the frozen references exactly, with zero maximum absolute difference. All **15 original engine PNGs** matched byte-for-byte and pixel-for-pixel. Ordered inputs, retained values, completed numeric downloads, all 15 SVG source/sample records and current-figure downloads, and the original c(k) uncertainty download were checked. Actual engine terminal messages appeared in the inline panel, without opening the modal, before each calculation completed. The combined numerical/source/browser audit passed **304/304 checks**.
 
-The unchanged paper-style renderer retains its **525/525** independent saved-data checks, including every source sample and plotted coordinate. Current fixture-based UI checks passed **63/63**, with **20/20** final layout checks. Focused terminal checks passed **42/42**, and independent diagram checks passed **21/21**. These presentation checks do not claim additional model runs.
+The unchanged paper-style renderer retains its **525/525** independent saved-data checks, including every source sample and plotted coordinate; the unchanged terminal viewer retains its **42/42** focused checks. Current version, citation, and diagram-label checks passed **36/36**, including **168 text-to-box measurements across two themes and four viewports**. These presentation checks do not claim additional model runs.
 
-Scientific source, models, scalers, predictor, and original dependency pins remain unchanged. A broader preservation check also found no changed bytes or filesystem modification times among 702 source files, including the original reference application and author materials. This evidence covers the three listed regression cases in the recorded environment, not new scientific accuracy or concurrent-hosting claims. See [VALIDATION.md](VALIDATION.md) for the baseline procedure, earlier check history, environment, and scope. Saved outputs and detailed current audit records remain in the local review archive.
+Application preservation checks passed: scientific source, models, scalers, predictor, original dependency pins, and original figure copies remain unchanged. The frozen frontend matches all three runtime copies and the local preview. This evidence covers the three listed regression cases in the recorded environment, not new scientific accuracy or concurrent-hosting claims. See [VALIDATION.md](VALIDATION.md) for the baseline procedure, current and historical results, environment, and scope. Saved outputs and detailed current audit records remain in the local review archive.
 
 ## Inputs and results
 
@@ -112,7 +112,7 @@ Scientific code and artifacts are author-controlled: `ML_closure.py`, `QHO.py`, 
 
 [SOURCE_PROVENANCE.json](SOURCE_PROVENANCE.json) records the imported files' original checksums and observed filesystem timestamps. It describes the pre-redesign snapshot; changed documentation or frontend files will naturally have different current checksums. Filesystem timestamps are not proof of authorship dates or historical Git commits.
 
-For a reproducible issue, include the input triplet, candidate version, operating system, dependency inventory, and traceback. Internal slides and generated outputs are excluded from the release tree.
+For a reproducible issue, include the input triplet, software version, operating system, dependency inventory, and traceback. Internal slides and generated outputs are excluded from the release tree.
 
 ## Citation and license
 
@@ -120,4 +120,4 @@ Software author: **Zhihao Feng**, as identified in the original engine header. M
 
 Related manuscript: Zhihao Feng, Christian T. Randolph, Tyler B. Martin, and Thomas E. Gartner III, *A Machine Learning Closure for Polymer Integral Equation Theory*. [arXiv:2509.11030](https://arxiv.org/abs/2509.11030) (2025), version 3, July 30, 2026. [DOI:10.48550/arXiv.2509.11030](https://doi.org/10.48550/arXiv.2509.11030) identifies the preprint. Journal publication details will be added when confirmed.
 
-License selection is pending author approval. This candidate does not yet declare an open-source license.
+License selection is pending author approval. This software does not yet declare an open-source license.
