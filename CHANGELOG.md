@@ -2,6 +2,17 @@
 
 ## 1.0.6 — 2026-09-13 (current software version; private preparation)
 
+### Latest interface refinement
+
+- Replaced the initial illustration with an exact copy of the author-selected `val_3.png` polymer rendering, preserving the source image.
+- Simplified calculation feedback to one conceptual self-consistency-loop animation and a popup-only live terminal viewer. Actual process capture still uses the existing static route; no scientific code or backend route changed.
+- Added smooth disclosures and dark mode by default while respecting a saved light-mode preference.
+- Extended the study-scoped hero comparison to PY, HNC, and Modified Verlet and clarified Lennard–Jones reduced input units.
+- Kept software version `1.0.6`, scientific files, result data, and original plotting unchanged. The same three browser/model cases passed 310/310 checks: all 43,008 numeric values and 15 original PNGs exactly matched the frozen baselines, and real process output appeared in the manually opened popup before each run completed.
+- Passed 28/28 focused interface checks and 24/24 popup lifecycle checks. Disclosure resize and reduced-motion checks passed 3/3. All 702 recorded author-owned files remained unchanged this round; protected application files, selected source images, copied PNG, frozen reference archive, and 19 frozen frontend files passed preservation checks. Earlier results below remain historical records.
+
+### Preceding version and diagram-label revision
+
 - Adopted the author's selected software version `1.0.6` for current project metadata, software citation, documentation, and interface. This supersedes the earlier `1.1.0rc1` preparation label.
 - Preserved the scientific source and trained artifacts, including the engine's historical `1.0.5` header and original dependency specification.
 - Retained the existing repository, its 2023 creation record, original commits, and historical `v1.1.0-rc.1` tag. No `v1.0.6` tag, replacement tag, package publication, or public release is created by this version change.

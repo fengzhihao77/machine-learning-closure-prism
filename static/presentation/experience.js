@@ -4,41 +4,22 @@
   const app = document.querySelector('[data-ml-app]');
   const byId = (id) => document.getElementById(id);
   const reducedMotion = matchMedia('(prefers-reduced-motion: reduce)');
-  const views = {
-    loop: {
-      title: 'Self-consistency loop',
-      description: 'The closure and the PRISM relation are applied repeatedly to update the correlations.',
-      graphic: `<svg class="concept-graphic loop-graphic" viewBox="0 0 520 230" aria-hidden="true"><defs><marker id="loop-arrow" markerWidth="7" markerHeight="7" refX="6" refY="3.5" orient="auto"><path d="m1 1 5 2.5L1 6"/></marker></defs><g class="concept-links" marker-end="url(#loop-arrow)"><path d="M218 58h80"/><path d="M398 91v43"/><path d="M300 172h-80"/><path d="M118 138V95"/></g><g class="concept-node loop-node" style="--step:0"><rect x="22" y="24" width="196" height="66" rx="5"/><text x="120" y="52">Trial correlations</text><text class="concept-math" x="120" y="77">h(k)</text></g><g class="concept-node loop-node" style="--step:1"><rect x="300" y="24" width="196" height="66" rx="5"/><text x="398" y="52">ML closure</text><text class="concept-math" x="398" y="77">c(k)</text></g><g class="concept-node loop-node" style="--step:2"><rect x="300" y="139" width="196" height="66" rx="5"/><text x="398" y="167">PRISM relation</text><text class="concept-math" x="398" y="192">h(k), γ(k)</text></g><g class="concept-node loop-node" style="--step:3"><rect x="22" y="139" width="196" height="66" rx="5"/><text x="120" y="167">Update correlations</text><text class="concept-math" x="120" y="192">next iteration</text></g></svg>`
-    },
-    exchange: {
-      title: 'Correlation exchange',
-      description: 'Intramolecular and direct correlations enter PRISM; intermolecular and indirect correlations connect the next update.',
-      graphic: `<svg class="concept-graphic exchange-graphic" viewBox="0 0 520 230" aria-hidden="true"><g class="exchange-links"><path d="M105 64h74q20 0 20 20v22h45"/><path d="M105 174h74q20 0 20-20v-22h45"/><path d="M328 119h50"/></g><g class="concept-node"><rect x="22" y="34" width="88" height="61" rx="5"/><text class="concept-math" x="66" y="72">ω(k)</text><rect x="22" y="144" width="88" height="61" rx="5"/><text class="concept-math" x="66" y="182">c(k)</text><rect x="244" y="82" width="84" height="74" rx="5"/><text x="286" y="125">PRISM</text><rect x="378" y="87" width="112" height="64" rx="5"/><text class="concept-math" x="434" y="126">h(k)</text></g><text class="exchange-note" x="356" y="216">γ(k) = h(k) − c(k)</text></svg>`
-    },
-    pulse: {
-      title: 'Activity pulse',
-      description: 'A quiet activity indicator with constant timing, independent of the residual or the number of iterations.',
-      graphic: `<div class="activity-graphic" aria-hidden="true"><div class="activity-equation"><span>γ(k)</span><span>=</span><span>h(k)</span><span>−</span><span>c(k)</span></div><div class="activity-lines"><span></span><span></span><span></span><span></span><span></span></div></div>`
+  // A single conceptual view; it is never driven by measured solver residuals.
+  const loopGraphic = `<svg class="concept-graphic loop-graphic" viewBox="0 0 520 230" aria-hidden="true"><defs><marker id="loop-arrow" markerWidth="7" markerHeight="7" refX="6" refY="3.5" orient="auto"><path d="m1 1 5 2.5L1 6"/></marker></defs><g class="concept-links" marker-end="url(#loop-arrow)"><path d="M218 58h80"/><path d="M398 91v43"/><path d="M300 172h-80"/><path d="M118 138V95"/></g><g class="concept-node loop-node" style="--step:0"><rect x="22" y="24" width="196" height="66" rx="5"/><text x="120" y="52">Trial correlations</text><text class="concept-math" x="120" y="77">h(k)</text></g><g class="concept-node loop-node" style="--step:1"><rect x="300" y="24" width="196" height="66" rx="5"/><text x="398" y="52">ML closure</text><text class="concept-math" x="398" y="77">c(k)</text></g><g class="concept-node loop-node" style="--step:2"><rect x="300" y="139" width="196" height="66" rx="5"/><text x="398" y="167">PRISM relation</text><text class="concept-math" x="398" y="192">h(k), γ(k)</text></g><g class="concept-node loop-node" style="--step:3"><rect x="22" y="139" width="196" height="66" rx="5"/><text x="120" y="167">Update correlations</text><text class="concept-math" x="120" y="192">next iteration</text></g></svg>`;
+  for (const id of ['calculation-visual', 'animation-preview-visual']) {
+    const target = byId(id);
+    if (target) {
+      target.dataset.animation = 'loop';
+      target.innerHTML = loopGraphic.replaceAll('loop-arrow', `loop-arrow-${id}`);
     }
-  };
-  const picker = byId('convergence-animation');
-  function renderAnimation() {
-    const selected = picker && picker.value in views ? picker.value : 'loop';
-    const view = views[selected];
-    for (const id of ['calculation-visual', 'animation-preview-visual']) {
-      const target = byId(id);
-      if (target) { target.dataset.animation = selected; target.innerHTML = view.graphic.replaceAll('loop-arrow', `loop-arrow-${id}`); }
-    }
-    if (byId('animation-preview-title')) byId('animation-preview-title').textContent = view.title;
-    if (byId('animation-preview-description')) byId('animation-preview-description').textContent = view.description;
   }
-  if (picker) picker.addEventListener('change', renderAnimation);
-  renderAnimation();
+  if (byId('animation-preview-title')) byId('animation-preview-title').textContent = 'Self-consistency loop';
+  if (byId('animation-preview-description')) byId('animation-preview-description').textContent = 'The closure and the PRISM relation are applied repeatedly to update the correlations.';
 
   function wireDialog(dialogId, openId, closeId) {
     const dialog = byId(dialogId);
     if (!dialog) return;
-    if (byId(openId)) byId(openId).addEventListener('click', () => dialog.showModal());
+    if (byId(openId)) byId(openId).addEventListener('click', () => { if (!dialog.open) dialog.showModal(); });
     if (byId(closeId)) byId(closeId).addEventListener('click', () => dialog.close());
     dialog.addEventListener('click', (event) => {
       if (event.target !== dialog) return;
@@ -75,7 +56,6 @@
     const calculating = state === 'calculating';
     const busy = calculating || state === 'retrieving';
     if (byId('preview-convergence')) byId('preview-convergence').disabled = busy;
-    if (byId('inline-terminal')) byId('inline-terminal').hidden = state === 'ready';
     if (byId('calculation-visual')) byId('calculation-visual').classList.toggle('animation-paused', !calculating);
     if (byId('conceptual-note')) byId('conceptual-note').textContent = state === 'retrieving' ? 'The calculation returned. Saved output files are being retrieved.' : 'Conceptual animation; its timing is independent of the solver.';
     if (state === lastState) return;
@@ -94,20 +74,129 @@
   updateEventSource('Browser events', 'These entries report requests and downloads observed by this page. They do not contain the Python solver’s terminal output.');
   observeState();
 
+  // Keep native details/summary semantics, including Enter and Space activation.
+  // The open attribute remains set during closing so its content can animate.
+  const folds = new Map();
+  function enhanceDetails(details) {
+    if (folds.has(details)) return folds.get(details);
+    const summary = details.querySelector(':scope > summary');
+    if (!summary) return null;
+    const state = { details, summary, desired: details.open, animation: null, resolve: null, promise: null };
+    folds.set(details, state);
+    function settle(completed = true) {
+      if (state.animation) {
+        state.animation.onfinish = null;
+        state.animation.cancel();
+        state.animation = null;
+      }
+      details.open = state.desired;
+      details.style.removeProperty('height');
+      details.style.removeProperty('overflow');
+      delete details.dataset.foldAnimating;
+      details.dataset.foldState = state.desired ? 'open' : 'closed';
+      summary.removeAttribute('aria-expanded');
+      if (state.resolve) state.resolve(completed);
+      state.resolve = null;
+      state.promise = null;
+    }
+    function targetHeight() {
+      const previous = details.style.height;
+      details.style.height = 'auto';
+      const expanded = details.getBoundingClientRect().height;
+      details.style.height = previous;
+      if (state.desired) return expanded;
+      const box = getComputedStyle(details);
+      const head = getComputedStyle(summary);
+      return summary.getBoundingClientRect().height +
+        ['paddingTop', 'paddingBottom', 'borderTopWidth', 'borderBottomWidth'].reduce((n, key) => n + (parseFloat(box[key]) || 0), 0) +
+        (parseFloat(head.marginTop) || 0) + (parseFloat(head.marginBottom) || 0);
+    }
+    function animate(open, resizing = false) {
+      const desired = Boolean(open);
+      if (!resizing && state.animation && state.desired === desired) return state.promise;
+      if (!state.animation && details.open === desired) {
+        state.desired = desired;
+        return Promise.resolve(true);
+      }
+      const from = details.getBoundingClientRect().height;
+      if (state.animation) {
+        state.animation.onfinish = null;
+        state.animation.cancel();
+        state.animation = null;
+      }
+      if (!resizing && state.resolve) state.resolve(false);
+      state.desired = desired;
+      if (!resizing || !state.promise) state.promise = new Promise((resolve) => { state.resolve = resolve; });
+      const promise = state.promise;
+      if (!desired && details.contains(document.activeElement) && !summary.contains(document.activeElement)) summary.focus({ preventScroll: true });
+      details.open = true;
+      details.style.height = `${from}px`;
+      details.style.overflow = 'hidden';
+      details.dataset.foldState = desired ? 'open' : 'closed';
+      summary.setAttribute('aria-expanded', String(desired));
+      const to = targetHeight();
+      if (reducedMotion.matches || !details.animate || Math.abs(to - from) < 1) {
+        settle();
+        return promise;
+      }
+      details.dataset.foldAnimating = desired ? 'opening' : 'closing';
+      state.animation = details.animate([{ height: `${from}px` }, { height: `${to}px` }], {
+        duration: 360, easing: 'cubic-bezier(.2,.75,.25,1)', fill: 'forwards'
+      });
+      state.animation.onfinish = () => settle();
+      return promise;
+    }
+    state.setOpen = animate;
+    state.settle = settle;
+    summary.addEventListener('click', (event) => {
+      if (event.defaultPrevented || event.button !== 0 || event.target.closest('a,button,input,select,textarea')) return;
+      event.preventDefault();
+      animate(!state.desired);
+    });
+    details.addEventListener('toggle', () => {
+      if (!state.animation) {
+        state.desired = details.open;
+        details.dataset.foldState = details.open ? 'open' : 'closed';
+      }
+    });
+    if ('ResizeObserver' in window) {
+      const observer = new ResizeObserver(() => {
+        if (state.animation) animate(state.desired, true);
+      });
+      // Observe intrinsic contents, not the animated outer box, to avoid feedback.
+      for (const child of details.children) observer.observe(child);
+    }
+    return state;
+  }
+  for (const details of document.querySelectorAll('details')) enhanceDetails(details);
+  window.MLClosureDetails = Object.freeze({
+    setOpen: (target, open) => {
+      const details = typeof target === 'string' ? byId(target) : target;
+      if (!details || details.tagName !== 'DETAILS') return Promise.resolve(false);
+      return enhanceDetails(details)?.setOpen(open) || Promise.resolve(false);
+    }
+  });
+  reducedMotion.addEventListener('change', () => {
+    if (reducedMotion.matches) for (const state of folds.values()) if (state.animation) state.settle();
+  });
+
   // A deliberate, slower anchor transition; ordinary scrolling stays under the user's control.
   let scrollFrame = null;
-  function stopScroll() { if (scrollFrame !== null) cancelAnimationFrame(scrollFrame); scrollFrame = null; }
+  let navigationEpoch = 0;
+  function stopScroll() { navigationEpoch += 1; if (scrollFrame !== null) cancelAnimationFrame(scrollFrame); scrollFrame = null; }
   ['wheel', 'touchstart', 'pointerdown'].forEach((type) => window.addEventListener(type, stopScroll, { passive: true }));
   window.addEventListener('keydown', (event) => { if (['ArrowUp', 'ArrowDown', 'PageUp', 'PageDown', 'Home', 'End', 'Escape', 'Tab'].includes(event.key)) stopScroll(); });
   document.documentElement.classList.add('enhanced-navigation');
   document.querySelectorAll('a[href^="#"]').forEach((link) => {
-    link.addEventListener('click', (event) => {
+    link.addEventListener('click', async (event) => {
       if (event.button !== 0 || event.metaKey || event.ctrlKey || event.shiftKey || event.altKey || link.classList.contains('skip-link')) return;
       const target = document.getElementById(link.hash.slice(1));
       if (!target) return;
       event.preventDefault();
-      if (link.hash === '#method' && byId('method-details')) byId('method-details').open = true;
       stopScroll();
+      const intent = navigationEpoch;
+      if (link.hash === '#method') await window.MLClosureDetails.setOpen('method-details', true);
+      if (intent !== navigationEpoch) return;
       const start = window.scrollY;
       const header = document.querySelector('.site-header').getBoundingClientRect().height;
       const desired = link.hash === '#top' ? 0 : target.getBoundingClientRect().top + start - header - 22;

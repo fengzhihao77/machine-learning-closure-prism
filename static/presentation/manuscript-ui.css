@@ -23,3 +23,8 @@ html.enhanced-navigation{scroll-behavior:auto}
 @media(max-width:360px){.header-inner .brand>span{display:none}.header-inner .brand-mark{width:29px;height:29px}.header-inner{gap:12px}.main-nav{gap:14px;font-size:10px}}
 
 @media(max-width:650px){.manuscript-figure{max-width:100%;overflow-x:auto;overflow-y:hidden;scrollbar-width:thin;scrollbar-color:var(--gold) var(--soft);padding-bottom:12px}.manuscript-figure>svg{min-width:960px}.manuscript-figure::-webkit-scrollbar{height:7px}.manuscript-figure::-webkit-scrollbar-track{background:var(--soft)}.manuscript-figure::-webkit-scrollbar-thumb{background:var(--gold);border-radius:4px}}
+
+/* Native details semantics remain intact while the presentation script animates height. */
+details[data-fold-animating]{overflow:hidden}.units-note{font-size:10px;line-height:1.7;color:var(--muted);margin-top:17px}.field-help sub,.field-help sup{font-size:75%;line-height:0}.animation-options #preview-convergence{font-size:10px}.panel-description{max-width:240px}
+@media(max-width:850px){.panel-description{max-width:none}.units-note{text-align:center;margin-top:14px}}
+@media(max-width:650px){.units-note{margin-top:14px}.animation-options #preview-convergence{font-size:10px}}

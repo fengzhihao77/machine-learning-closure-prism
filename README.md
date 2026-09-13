@@ -54,39 +54,39 @@ Open the local URL printed by Flask, normally [http://127.0.0.1:5000](http://127
 
 Use one prediction at a time. Each calculation overwrites the same result filenames, so this version is intended for a single local user and is not prepared for concurrent public requests.
 
-The launch command captures real stdout/stderr while keeping it visible in the launching terminal. A **Python terminal** panel appears automatically during calculation and shows the latest 60 captured lines without opening a popup. **Live terminal** opens the larger log window with up to 500 lines. The inline feed keeps updating when that window closes and retains its final captured output after the run.
+The launch command captures real stdout/stderr while keeping it visible in the launching terminal. **Live terminal** opens a popup showing up to 500 captured lines. It can be opened during calculation to inspect actual engine messages; closing it stops the viewer polling. Terminal output is shown in this popup, with no inline feed.
 
-The existing Flask static route serves the generated log; no scientific code or route is modified. The viewer hides its own log requests and labels capture or connection failures explicitly. Output belongs to the whole local process and may include previous calculations. Existing engine messages report loading, model convergence, and exports; the disabled iteration-residual print statement is not enabled by this frontend. Running `python ML_closure.py` without capture leaves the inline feed unavailable and the popup clearly labeled as browser events. Terminal logs and generated predictions are ignored by Git. Keep this single-user local configuration private.
+The existing Flask static route serves the generated log; no scientific code or route is modified. The viewer hides its own log requests and labels capture or connection failures explicitly. Output belongs to the whole local process and may include previous calculations. Existing engine messages report loading, model convergence, and exports; the disabled iteration-residual print statement is not enabled by this frontend. Running `python ML_closure.py` without capture leaves the popup clearly labeled as browser events. Terminal logs and generated predictions are ignored by Git. Keep this single-user local configuration private.
 
 ## Regression checks
 
-The current **v1.0.6** interface, metadata, citation link, and diagram-label adjustments passed the full three-state regression on September 13, 2026.
+The latest **v1.0.6** interface refinement passed its three-state browser/model regression and focused presentation checks on September 13, 2026.
 
 Three state points were selected before execution with Python's `random.Random(20260913)`: independent draws of integer `N` in [20, 100], uniform `epsilon` in [0, 0.5], and uniform `rho` in [0.2, 0.8], with the latter two rounded to three decimals.
 
 | Case | N | epsilon | rho | Original complete check (s) | Current browser check (s) |
 | --- | --- | --- | --- | --- | --- |
-| 1 | 32 | 0.311 | 0.671 | 74.62 | 66.73 |
-| 2 | 49 | 0.407 | 0.701 | 65.30 | 65.65 |
-| 3 | 67 | 0.188 | 0.399 | 24.21 | 25.85 |
+| 1 | 32 | 0.311 | 0.671 | 74.62 | 65.19 |
+| 2 | 49 | 0.407 | 0.701 | 65.30 | 66.19 |
+| 3 | 67 | 0.188 | 0.399 | 24.21 | 26.45 |
 
 These are observed wall times for the complete checks, not a performance benchmark or evidence of a speed improvement.
 
-All three cases completed with all five ensemble folds converged and finite 2,048 × 7 exported arrays. All **43,008 numeric values** matched the frozen references exactly, with zero maximum absolute difference. All **15 original engine PNGs** matched byte-for-byte and pixel-for-pixel. Ordered inputs, retained values, completed numeric downloads, all 15 SVG source/sample records and current-figure downloads, and the original c(k) uncertainty download were checked. Actual engine terminal messages appeared in the inline panel, without opening the modal, before each calculation completed. The combined numerical/source/browser audit passed **304/304 checks**.
+All three cases completed with all five ensemble folds converged and finite 2,048 × 7 exported arrays. All **43,008 numeric values** matched the frozen references exactly, with zero maximum absolute difference. All **15 original engine PNGs** matched byte-for-byte and pixel-for-pixel. Ordered inputs, retained values, completed numeric downloads, all 15 SVG source/sample records and current-figure downloads, and the original c(k) uncertainty download were checked. Genuine engine messages appeared in the manually opened terminal popup before every calculation completed. The combined numerical/source/browser audit passed **310/310 checks**.
 
-The unchanged paper-style renderer retains its **525/525** independent saved-data checks, including every source sample and plotted coordinate; the unchanged terminal viewer retains its **42/42** focused checks. Current version, citation, and diagram-label checks passed **36/36**, including **168 text-to-box measurements across two themes and four viewports**. These presentation checks do not claim additional model runs.
+Focused interface checks passed **28/28**, and terminal-popup lifecycle checks passed **24/24**. Desktop and phone renderings were visually inspected. Disclosure resize and reduced-motion checks passed **3/3**. The unchanged paper-style renderer retains its earlier **525/525** independent saved-data checks, including every source sample and plotted coordinate; those checks do not claim additional model runs.
 
-Application preservation checks passed: scientific source, models, scalers, predictor, original dependency pins, and original figure copies remain unchanged. The frozen frontend matches all three runtime copies and the local preview. This evidence covers the three listed regression cases in the recorded environment, not new scientific accuracy or concurrent-hosting claims. See [VALIDATION.md](VALIDATION.md) for the baseline procedure, current and historical results, environment, and scope. Saved outputs and detailed current audit records remain in the local review archive.
+Preservation checks passed: all 702 files in the recorded author-owned inventory remained unchanged during this round. The protected scientific files and original requirements, selected PNG/TGA sources, exact copied PNG, and frozen reference archive were preserved. The frozen 19-file frontend matched the checkout, all three runtime copies, and the local preview. This evidence covers the three listed regression cases in the recorded environment, not new scientific accuracy or concurrent-hosting claims. See [VALIDATION.md](VALIDATION.md) for current and historical results, environment, and scope. Saved outputs and detailed audit records remain in the local review archive.
 
 ## Inputs and results
 
 | Input | Meaning | Existing interface guidance |
 | --- | --- | --- |
-| `N` | Chain length | Whole numbers, 20–100 |
-| `epsilon` | Interaction-strength parameter, ε | 0.0–0.5 |
-| `rho` | Number-density parameter, ρ | 0.2–0.8 |
+| `N` | Number of monomers per chain | Integers, 20–100 |
+| `epsilon` | Interaction well depth, ε, in kBT | 0.0–0.5 |
+| `rho` | Monomer number density, ρ, in σ⁻³ | 0.2–0.8 |
 
-Use the model's reduced conventions. These ranges reproduce the existing interface guidance; they do not establish a new applicability domain or guarantee convergence. The interaction parameter scales the potential, rather than attraction alone.
+Inputs use Lennard–Jones reduced units with bead diameter σ and the study's fixed reduced temperature T*=1. The reduced density is physical monomer number density multiplied by σ³. An interaction input of ε = 0 selects purely repulsive WCA interactions. These ranges reproduce the existing interface guidance; they do not establish a new applicability domain or guarantee convergence. No input-unit conversion is applied by the frontend.
 
 Successful calculations write five PNG plots and `pred_data.txt` under `static/pred_results/`. The data file contains 2,048 rows for the web defaults and seven columns:
 
@@ -104,7 +104,9 @@ Numeric rows are whitespace-delimited even though the comment header contains co
 
 The standard scientific view draws these exact samples in the browser, following manuscript Figures 3–5: boxed axes, inward ticks, and a red ML curve. It applies no smoothing, resampling, or unit conversion. The state point appears in the figure toolbar, and the current figure downloads as SVG with source-data provenance. The c(k) view shows the mean only because per-fold uncertainty is absent from the numerical table. The data-details panel provides a separate download of the original c(k) PNG with its uncertainty band. The engine continues to export all five original PNGs, and the complete numerical download remains unchanged.
 
-Three selectable animations illustrate self-consistency, correlation exchange, or activity. They can be previewed before a run and do not represent measured iteration counts, residuals, or completion percentages. Manuscript-derived inline vector diagrams explain the architecture and PRISM workflow. These are presentation recreations of the manuscript equations, labels, and flow; the author’s original figures remain unchanged.
+A single self-consistency-loop animation accompanies calculation. It is conceptual and does not represent measured iteration counts, residuals, or completion percentages. The initial polymer illustration is an exact copy of the author-selected `val_3.png` rendering, not a calculated correlation plot. Manuscript-derived inline vector diagrams explain the architecture and PRISM workflow; the author’s original figures remain unchanged. The interface starts in dark mode when no preference is saved, respects a saved light-mode choice, and expands its detail sections smoothly.
+
+The introductory comparison names the Percus–Yevick (PY), hypernetted-chain (HNC), and Modified Verlet (MV) atomic closures for the systems studied. These comparisons have different benchmark sets; the wording does not imply a universal ranking or expand the model’s scientific validation.
 
 ## Development and provenance
 

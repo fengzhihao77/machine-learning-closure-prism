@@ -1,15 +1,11 @@
-/* Read an optional generated log through the existing Flask static-file route.
- * No new route, solver instrumentation, or inferred progress is used here.
+/* Read optional process capture through the existing Flask static-file route.
+ * This popup never creates a route, instruments the solver, or infers progress.
  */
 (() => {
   'use strict';
   const app = document.querySelector('[data-ml-app]');
   const dialog = document.getElementById('log-dialog');
   const output = document.getElementById('log-output');
-  const inline = document.getElementById('inline-terminal');
-  const inlineOutput = document.getElementById('inline-terminal-output');
-  const inlineSource = document.getElementById('inline-terminal-source');
-  const inlineNote = document.getElementById('inline-terminal-note');
   const view = window.MLClosureLogView;
   if (!app || !dialog || !output || !view || !app.dataset.terminalLogSrc) return;
   const url = new URL(app.dataset.terminalLogSrc, location.href);
@@ -20,7 +16,8 @@
   let epoch = 0;
   let pageActive = true;
   const busy = () => ['calculating', 'retrieving'].includes(app.dataset.state);
-  const wanted = () => pageActive && (busy() || dialog.open);
+  // The process writes its capture independently. Read it only while requested.
+  const wanted = () => pageActive && dialog.open;
   let wasBusy = busy();
   const escapedPath = url.pathname.replace(/[.*+?^${}()|[\]\\]/g, '\\$&');
   const ownRequest = new RegExp(`"(?:GET|HEAD) ${escapedPath}(?:\\?| |/)`);
@@ -32,36 +29,29 @@
     if (controller) controller.abort();
     controller = null;
   }
+  function setState(state) {
+    dialog.dataset.terminalState = state;
+    output.dataset.terminalState = state;
+  }
   function visibleLines(text) {
     const plain = text.replace(/\x1b\[[0-?]*[ -/]*[@-~]/g, '').replace(/\r\n?/g, '\n');
-    // Hide only the log viewer's own HTTP access noise. Original log bytes on disk
-    // stay intact. All displayed calculation messages originate in the process.
+    // Suppress only the viewer's own access noise; original disk bytes are intact.
     return plain.split('\n').filter((line) => !ownRequest.test(line));
   }
-  function tail(lines, count) {
-    return (lines.length > count ? `[Showing the latest ${count} terminal lines]\n` : '') + lines.slice(-count).join('\n');
-  }
-  function setInline(state, label, note, placeholder) {
-    if (inline) inline.dataset.terminalState = state;
-    if (inlineSource) inlineSource.textContent = label;
-    if (inlineNote) inlineNote.textContent = note;
-    if (inlineOutput && !active && placeholder) inlineOutput.textContent = placeholder;
-  }
-  function writeOutput(target, text, capturedAt) {
-    if (!target) return;
-    const atBottom = target.scrollHeight - target.scrollTop - target.clientHeight < 48;
-    if (target.textContent !== text) target.textContent = text;
-    if (atBottom) target.scrollTop = target.scrollHeight;
-    target.dataset.terminalAvailable = 'true';
-    target.dataset.capturedAt = capturedAt;
+  function writeOutput(text, capturedAt) {
+    const atBottom = output.scrollHeight - output.scrollTop - output.clientHeight < 48;
+    if (output.textContent !== text) output.textContent = text;
+    if (atBottom) output.scrollTop = output.scrollHeight;
+    output.dataset.terminalAvailable = 'true';
+    output.dataset.capturedAt = capturedAt;
   }
   function connecting() {
-    setInline('connecting', 'Connecting to Python terminal',
-      'Reading this local process’s captured output. Earlier calculations may also appear.',
-      'Waiting for captured process output…');
+    setState(active ? 'reconnecting' : 'connecting');
+    if (active) view.setSource('Local Python terminal · reconnecting', 'Reading this local process’s captured output. The last capture remains below; earlier calculations may also appear.', 'terminal');
+    else view.setSource('Connecting to Python terminal', 'Waiting for captured process output. Browser events remain below until the connection succeeds.', 'browser');
   }
-  async function poll(currentEpoch, finalRead = false) {
-    const current = () => pageActive && currentEpoch === epoch && (wanted() || finalRead);
+  async function poll(currentEpoch) {
+    const current = () => currentEpoch === epoch && wanted();
     if (!current()) return;
     const requestController = new AbortController();
     controller = requestController;
@@ -72,11 +62,9 @@
       if (!current()) return;
       if (response.status === 404) {
         nextDelay = busy() ? 1500 : 5000;
-        if (!active) view.setSource('Browser events', 'Terminal capture is not enabled for this local server. These entries show browser requests and downloads, not Python terminal output.', 'browser');
-        else view.setSource('Local Python terminal · unavailable', 'The log file is currently unavailable. The last captured output remains below.', 'terminal');
-        setInline('unavailable', active ? 'Python terminal · unavailable' : 'Terminal capture unavailable',
-          active ? `The last captured output remains below. ${wanted() ? 'Retrying the log connection.' : 'Open Live terminal to retry.'}` : 'Real process output is not available from this local server yet.',
-          wanted() ? 'No terminal messages have been received. Retrying capture…' : 'No terminal messages have been received. Open Live terminal to retry.');
+        setState('unavailable');
+        if (!active) view.setSource('Browser events · terminal unavailable', 'Terminal capture is not enabled for this local server. These entries show browser requests and downloads, not Python output. Retrying while this popup is open.', 'browser');
+        else view.setSource('Local Python terminal · unavailable', 'The log file is currently unavailable. The last captured output remains below; retrying while this popup is open.', 'terminal');
         return;
       }
       if (!response.ok) throw new Error(`HTTP ${response.status}`);
@@ -85,41 +73,37 @@
       if (!current()) return;
       if (!active) view.clear();
       active = true;
+      setState('live');
       const lines = visibleLines(text);
-      const capturedAt = new Date().toISOString();
-      const note = 'Actual stdout and stderr from this local server process; earlier calculations may also appear. Log-viewer HTTP requests are hidden.';
-      view.setSource(wanted() ? 'Local Python terminal · live' : 'Local Python terminal · captured', note, 'terminal');
-      setInline(busy() ? 'live' : 'captured', busy() ? 'Python terminal · live' : 'Python terminal · captured', note);
-      writeOutput(output, tail(lines, 500) || 'Waiting for the process to write terminal output…', capturedAt);
-      writeOutput(inlineOutput, tail(lines, 60) || 'Waiting for the process to write terminal output…', capturedAt);
+      const tail = (lines.length > 500 ? '[Showing the latest 500 terminal lines]\n' : '') + lines.slice(-500).join('\n');
+      view.setSource('Local Python terminal · live', 'Actual stdout and stderr from this local server process; earlier calculations may also appear. Log-viewer HTTP requests are hidden.', 'terminal');
+      writeOutput(tail || 'Waiting for the process to write terminal output…', new Date().toISOString());
     } catch (error) {
       if (!current()) return;
-      if (active) view.setSource(wanted() ? 'Local Python terminal · reconnecting' : 'Local Python terminal · unavailable', 'The log connection is delayed. Displayed output may be stale; this does not indicate whether the calculation has stopped.', 'terminal');
-      else view.setSource('Browser events', 'Terminal output could not be retrieved. These entries show browser activity; the calculation may still be running.', 'browser');
-      setInline(wanted() ? 'reconnecting' : 'unavailable', active ? `Python terminal · ${wanted() ? 'reconnecting' : 'unavailable'}` : 'Terminal connection delayed',
-        active ? `Displayed output may be stale. ${wanted() ? 'This does not indicate whether the calculation has stopped.' : 'Open Live terminal to retry.'}` : 'Real terminal output could not be retrieved. The calculation may still be running.',
-        wanted() ? 'Waiting for the connection to captured process output…' : 'No terminal messages have been received. Open Live terminal to retry.');
+      setState('reconnecting');
+      if (active) view.setSource('Local Python terminal · reconnecting', 'The log connection is delayed. Displayed output may be stale; this does not indicate whether the calculation has stopped. Retrying while this popup is open.', 'terminal');
+      else view.setSource('Browser events · terminal connection delayed', 'Terminal output could not be retrieved. These entries show browser activity; the calculation may still be running. Retrying while this popup is open.', 'browser');
     } finally {
       clearTimeout(timeout);
       if (controller === requestController) controller = null;
-      if (wanted() && currentEpoch === epoch) timer = setTimeout(() => poll(currentEpoch), nextDelay);
+      if (current()) timer = setTimeout(() => poll(currentEpoch), nextDelay);
     }
   }
-  function restart(finalRead = false) {
+  function restart() {
     stop();
-    if (wanted() || (pageActive && finalRead)) poll(epoch, finalRead);
+    if (wanted()) { connecting(); poll(epoch); }
   }
   new MutationObserver(() => {
     const running = busy();
-    if (running && !wasBusy) { connecting(); restart(); }
-    else if (!running && wasBusy) restart(true);
+    if (running !== wasBusy && wanted()) restart();
     wasBusy = running;
   }).observe(app, { attributes: true, attributeFilter: ['data-state'] });
-  document.getElementById('open-log')?.addEventListener('click', () => restart());
-  // A queued close event from an earlier opening must not cancel the new poll.
-  // Closing the modal also must not stop the feed beneath an active calculation.
-  dialog.addEventListener('close', () => { if (!dialog.open && !busy()) stop(); });
+  // Observe native dialog state, including keyboard/programmatic openings.
+  new MutationObserver(() => { if (wanted()) restart(); else stop(); })
+    .observe(dialog, { attributes: true, attributeFilter: ['open'] });
+  // A queued close event from an earlier opening must not cancel a newer poll.
+  dialog.addEventListener('close', () => { if (!dialog.open) stop(); });
   window.addEventListener('pagehide', () => { pageActive = false; stop(); });
   window.addEventListener('pageshow', () => { pageActive = true; if (wanted()) restart(); });
-  if (wanted()) { connecting(); restart(); }
+  if (wanted()) restart();
 })();
