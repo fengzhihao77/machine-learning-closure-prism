@@ -72,3 +72,12 @@ details[data-fold-animating]{overflow:hidden}.units-note{font-size:10px;line-hei
 @media(prefers-reduced-motion:reduce){#model-progress-fill{transition:none}}
 @media(max-width:850px){#calculation-view{min-height:370px;padding:27px 20px}#calculation-visual{max-width:570px}}
 @media(max-width:650px){#calculation-view{min-height:310px;padding:24px 12px}#calculation-visual .concept-node text{font-size:18px}#calculation-visual .concept-node .concept-math{font-size:21px}#calculation-overlay{margin-top:18px}#calculation-overlay h4{font-size:20px}#calculation-overlay p{font-size:11px}#conceptual-note{font-size:9px;margin-top:16px}#model-status-list>li{padding:13px 3px 0;font-size:9px}#model-status-list>li strong{font-size:9px}#model-progress-count{font-size:9px}#model-status-note{font-size:9px}.model-run-summary{padding-top:12px;margin-bottom:15px}}
+
+.footer-research{min-width:0;display:grid;gap:5px}
+.site-footer .footer-research p{margin:0;order:initial;width:auto}
+.footer-contact{display:flex;align-items:center;flex-wrap:wrap;gap:4px 18px;font-size:11px;line-height:1.6}
+.footer-contact-label{font-size:10px;color:var(--muted)}
+.footer-contact a{display:inline-flex;align-items:center;gap:5px;min-height:32px;padding:4px 0;color:var(--gold-deep);text-decoration:underline;text-decoration-color:var(--line);text-underline-offset:4px}
+.footer-contact a:hover{text-decoration-color:currentColor}
+.footer-contact a:focus-visible{outline:2px solid var(--gold);outline-offset:4px;border-radius:2px}
+@media(max-width:850px){.footer-research{order:4;flex-basis:100%;padding-top:2px}.footer-contact{column-gap:18px}}
