@@ -8,8 +8,6 @@ An open-source, interactive Predictor for polymer structure using a machine lear
 
 Sign in to GitHub and create your own Codespace using the link above. After setup, the Predictor opens on forwarded port 7860. Each Codespace uses its owner's compute and storage allowance; included free usage depends on your account and remaining quota. You can also run locally below.
 
-The maintainer's existing [preview](https://ml-closure-predictor-g9v7w4g9jvq3pgg7-7860.app.github.dev) and [resume link](https://ml-closure-predictor-g9v7w4g9jvq3pgg7.github.dev) remain private to the maintainer. That preview stops after 10 idle minutes and expires after 7 inactive days; the public repository is preserved.
-
 ## Run locally
 
 Use Python **3.9.23**, Google Chrome, and a compatible ChromeDriver on `PATH`. On macOS ARM64, install the recorded environment with [uv](https://docs.astral.sh/uv/getting-started/installation/):
@@ -34,6 +32,6 @@ The Codespaces build completed three reference state-point checks. Numerical res
 
 ## History
 
-Created **February 2, 2023**. [Commit history](https://github.com/fengzhihao77/machine-learning-closure-prism/commits/main/) · [Changelog](CHANGELOG.md).
+Development history dates to **February 2023**. [Commit history](https://github.com/fengzhihao77/machine-learning-closure-prism/commits/main/) · [Changelog](CHANGELOG.md).
 
 Released under the [MIT license](LICENSE).
