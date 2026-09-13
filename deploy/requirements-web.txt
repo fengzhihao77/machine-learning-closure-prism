@@ -1,0 +1,2 @@
+# Public web serving only; scientific dependencies remain in requirements.txt.
+waitress==3.0.2

@@ -1,4 +1,4 @@
-/* Read the existing process capture. Raw output stays in the popup; model outcomes
+/* Read only the allocated run's capture. Raw output stays in the popup; model outcomes
  * use a pre-POST byte boundary and complete, freshly appended engine messages.
  */
 (() => {
@@ -8,9 +8,9 @@
   const output = document.getElementById('log-output');
   const view = window.MLClosureLogView;
   const modelLog = window.MLClosureModelLog;
-  if (!app || !dialog || !output || !view || !app.dataset.terminalLogSrc) return;
-  const url = new URL(app.dataset.terminalLogSrc, location.href);
-  if (url.origin !== location.origin) return;
+  if (!app || !dialog || !output || !view) return;
+  let url = null;
+  let ownRequest = null;
   let timer = null;
   let controller = null;
   let terminalActive = false;
@@ -22,10 +22,8 @@
   let finalTimer = null;
   const busy = () => ['calculating', 'retrieving'].includes(app.dataset.state);
   const tracking = () => Boolean(run?.tracker && !run.tracker.snapshot().rejected && ['running', 'finishing'].includes(run.phase));
-  const wanted = () => pageActive && (dialog.open || tracking());
+  const wanted = () => pageActive && Boolean(url) && (dialog.open || tracking());
   let wasBusy = busy();
-  const escapedPath = url.pathname.replace(/[.*+?^${}()|[\]\\]/g, '\\$&');
-  const ownRequest = new RegExp(`"(?:GET|HEAD) ${escapedPath}(?:\\?| |/)`);
   const emptyModels = () => ({ loaded: [], converged: [], failed: [], pending: [0, 1, 2, 3, 4], anchored: false, rejected: '' });
 
   function snapshot() {
@@ -62,7 +60,7 @@
   }
   function visibleLines(text) {
     const plain = text.replace(/\x1b\[[0-?]*[ -/]*[@-~]/g, '').replace(/\r\n?/g, '\n');
-    return plain.split('\n').filter((line) => !ownRequest.test(line));
+    return plain.split('\n').filter((line) => !ownRequest?.test(line));
   }
   function writeCapture(bytes) {
     if (!dialog.open) return;
@@ -72,8 +70,8 @@
     setState('live');
     const lines = visibleLines(new TextDecoder().decode(bytes));
     const tail = (lines.length > 500 ? '[Showing the latest 500 terminal lines]\n' : '') + lines.slice(-500).join('\n');
-    view.setSource('Local Python terminal · live', 'Actual stdout and stderr from this local server process; earlier calculations may also appear. Log-viewer HTTP requests are hidden.', 'terminal');
-    output.textContent = tail || 'Waiting for the process to write terminal output…';
+    view.setSource('Python terminal · this calculation', 'Actual stdout and stderr captured for this calculation only. Log-viewer HTTP requests are hidden.', 'terminal');
+    output.textContent = tail || 'Waiting for this calculation to write terminal output…';
     if (atBottom) output.scrollTop = output.scrollHeight;
     output.dataset.terminalAvailable = 'true';
     output.dataset.capturedAt = new Date().toISOString();
@@ -81,22 +79,24 @@
   function connecting() {
     if (!dialog.open) return;
     setState(terminalActive ? 'reconnecting' : 'connecting');
-    if (terminalActive) view.setSource('Local Python terminal · reconnecting', 'Reading this local process’s captured output. The last capture remains below; earlier calculations may also appear.', 'terminal');
-    else view.setSource('Connecting to Python terminal', 'Waiting for captured process output. Browser events remain below until the connection succeeds.', 'browser');
+    if (terminalActive) view.setSource('Python terminal · reconnecting', 'Reading this calculation’s captured output. Its last capture remains below.', 'terminal');
+    else view.setSource('Connecting to this calculation’s terminal', 'Waiting for captured output from this calculation. Browser events remain below until the connection succeeds.', 'browser');
   }
   function captureError(error) {
     if (!dialog.open) return;
-    if (error.status === 404) {
+    if (error.status === 404 || error.status === 410) {
       setState('unavailable');
-      if (!terminalActive) view.setSource('Browser events · terminal unavailable', 'Terminal capture is not enabled for this local server. These entries show browser requests and downloads, not Python output. Retrying while this popup is open.', 'browser');
-      else view.setSource('Local Python terminal · unavailable', 'The log file is currently unavailable. The last captured output remains below; retrying while this popup is open.', 'terminal');
+      if (!terminalActive) view.setSource('Browser events · terminal unavailable', 'This calculation’s capture is unavailable or has expired. These entries show browser activity, not Python output.', 'browser');
+      else view.setSource('Python terminal · unavailable', 'This calculation’s capture is unavailable or has expired. Its last captured output remains below.', 'terminal');
     } else {
       setState('reconnecting');
-      if (terminalActive) view.setSource('Local Python terminal · reconnecting', 'The log connection is delayed. Displayed output may be stale; this does not indicate whether the calculation has stopped. Retrying while this popup is open.', 'terminal');
+      if (terminalActive) view.setSource('Python terminal · reconnecting', 'This calculation’s log connection is delayed. Displayed output may be stale; this does not indicate whether the calculation has stopped. Retrying while this popup is open.', 'terminal');
       else view.setSource('Browser events · terminal connection delayed', 'Terminal output could not be retrieved. These entries show browser activity; the calculation may still be running. Retrying while this popup is open.', 'browser');
     }
   }
   async function readCapture(requestController, timeoutMs) {
+    const captureURL = url;
+    if (!captureURL) throw new Error('No calculation has been allocated.');
     let timeout;
     let onAbort;
     const cancelled = new Promise((_, reject) => {
@@ -106,7 +106,8 @@
     });
     try {
       return await Promise.race([cancelled, (async () => {
-        const response = await fetch(url, { cache: 'no-store', credentials: 'same-origin', signal: requestController.signal });
+        const response = await fetch(captureURL.href, { cache: 'no-store', credentials: 'same-origin', redirect: 'error', signal: requestController.signal });
+        if (response.url !== captureURL.href || response.redirected) throw new Error('The terminal response does not belong to this calculation.');
         if (!response.ok) throw Object.assign(new Error(`HTTP ${response.status}`), { status: response.status });
         if ((response.headers.get('content-type') || '').includes('text/html')) throw new Error('The log URL returned an HTML page.');
         return new Uint8Array(await response.arrayBuffer());
@@ -161,6 +162,10 @@
   }
   function restart() {
     stop();
+    if (!url) {
+      view.setSource('Browser events', 'No calculation has been submitted. Terminal output will appear here for your calculation after you run a state point.', 'browser');
+      setState('browser');
+    }
     if (wanted() && run?.phase !== 'preparing') { connecting(); poll(epoch); }
   }
   function reset() {
@@ -171,12 +176,28 @@
     preflightController = null;
     if (run?.resolve) run.resolve({ ...snapshot(), phase: 'cancelled' });
     run = null;
+    url = null;
+    ownRequest = null;
+    terminalActive = false;
+    view.clear();
+    view.setSource('Browser events', 'Terminal output will appear here only for your next calculation.', 'browser');
+    output.dataset.terminalAvailable = 'false';
+    delete output.dataset.capturedAt;
     emit();
-    if (wanted()) { connecting(); poll(epoch); }
+    setState('browser');
   }
-  async function prepare() {
+  async function prepare(logURL) {
     reset();
     stop();
+    if (typeof logURL !== 'string') throw new Error('A calculation-specific terminal address is required.');
+    const nextURL = new URL(logURL, location.href);
+    if (nextURL.origin !== location.origin || nextURL.username || nextURL.password || nextURL.href !== nextURL.origin + nextURL.pathname ||
+        !/^\/api\/runs\/[A-Za-z0-9_-]{43}\/terminal\.log$/.test(nextURL.pathname)) {
+      throw new Error('The terminal address does not identify an isolated calculation.');
+    }
+    url = nextURL;
+    const escapedPath = url.pathname.replace(/[.*+?^${}()|[\]\\]/g, '\\$&');
+    ownRequest = new RegExp(`"(?:GET|HEAD) ${escapedPath}(?:\\?| |/)`);
     const target = { id: ++sequence, phase: 'preparing', tracker: null, captureError: false, resolve: null };
     run = target;
     emit();

@@ -2,11 +2,13 @@
 
 An open-source, interactive Predictor for polymer structure using a machine learning closure for PRISM integral equation theory.
 
-## [Run the Predictor online](https://codespaces.new/fengzhihao77/machine-learning-closure-prism)
+## [Run the Predictor online](https://potential-acorn-w6qgjrw66vx37v7-7860.app.github.dev)
 
 **Version: 1.0.6-rc.1** · [MIT license](LICENSE).
 
-Sign in to GitHub and create your own Codespace using the link above. After setup, the Predictor opens on forwarded port 7860. Each Codespace uses its owner's compute and storage allowance; included free usage depends on your account and remaining quota. You can also run locally below.
+Open the shared Predictor, enter a state point, and run a calculation. No installation or GitHub sign-in is required. The demo accepts one calculation at a time; if it is busy, try again shortly. Download your results promptly. They expire after one hour and are cleared if the server restarts.
+
+The demo runs within the maintainer’s free Codespaces allowance and is available while its server is running. If it is offline, [create your own Codespace](https://codespaces.new/fengzhihao77/machine-learning-closure-prism) using your own GitHub allowance, or run locally below.
 
 ## Run locally
 

@@ -9,6 +9,7 @@ python3.9 -c 'import sys; assert sys.version_info[:3] == (3,9,23), sys.version'
 env_dir="${ML_CLOSURE_ENV_DIR:-${HOME}/.venvs/ml-closure-py39}"
 python3.9 -m venv "${env_dir}"
 "${env_dir}/bin/python" -m pip install --no-cache-dir -r "${project_dir}/requirements.txt" -c "${project_dir}/deploy/constraints-reference-common.txt"
+"${env_dir}/bin/python" -m pip install --no-cache-dir --no-deps -r "${project_dir}/deploy/requirements-web.txt"
 "${env_dir}/bin/python" -m pip check
 
 # Chrome for Testing publishes matching browser/driver assets. These files are
