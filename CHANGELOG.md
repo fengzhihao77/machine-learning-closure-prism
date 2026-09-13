@@ -2,6 +2,13 @@
 
 ## 1.0.6 — 2026-09-13 (current software version; private preparation)
 
+### Model-status and loop refinement
+
+- Added a concise on-page summary of current-run model convergence, including partial ensemble and unverified outcomes; raw terminal output remains in the popup.
+- Replaced the idle polymer rendering with a static self-consistency loop that animates during calculation. Version remains `1.0.6`; the scientific engine and iteration logging are unchanged.
+- Passed 319/319 checks from the same three actual browser/model runs: all 43,008 numeric values and 15 original PNGs matched the frozen references exactly. Model 0 status appeared before each run completed with the popup closed, and final 5/5 outcomes matched the engine logs.
+- Passed 47/47 focused UI checks and 72/72 model-status parser/transport checks, including partial and missing evidence in fixtures. All 702 recorded author-owned files and protected application/reference files were preserved; all 20 frozen frontend files matched the checkout, runtime copies, and preview. Earlier results below describe the preceding interfaces.
+
 ### Neutral-black theme refinement
 
 - Replaced the green-tinted dark palette with neutral black tones. This is a presentation-color refinement; software version remains `1.0.6`.

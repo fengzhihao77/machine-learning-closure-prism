@@ -4,18 +4,6 @@
   const app = document.querySelector('[data-ml-app]');
   const byId = (id) => document.getElementById(id);
   const reducedMotion = matchMedia('(prefers-reduced-motion: reduce)');
-  // A single conceptual view; it is never driven by measured solver residuals.
-  const loopGraphic = `<svg class="concept-graphic loop-graphic" viewBox="0 0 520 230" aria-hidden="true"><defs><marker id="loop-arrow" markerWidth="7" markerHeight="7" refX="6" refY="3.5" orient="auto"><path d="m1 1 5 2.5L1 6"/></marker></defs><g class="concept-links" marker-end="url(#loop-arrow)"><path d="M218 58h80"/><path d="M398 91v43"/><path d="M300 172h-80"/><path d="M118 138V95"/></g><g class="concept-node loop-node" style="--step:0"><rect x="22" y="24" width="196" height="66" rx="5"/><text x="120" y="52">Trial correlations</text><text class="concept-math" x="120" y="77">h(k)</text></g><g class="concept-node loop-node" style="--step:1"><rect x="300" y="24" width="196" height="66" rx="5"/><text x="398" y="52">ML closure</text><text class="concept-math" x="398" y="77">c(k)</text></g><g class="concept-node loop-node" style="--step:2"><rect x="300" y="139" width="196" height="66" rx="5"/><text x="398" y="167">PRISM relation</text><text class="concept-math" x="398" y="192">h(k), γ(k)</text></g><g class="concept-node loop-node" style="--step:3"><rect x="22" y="139" width="196" height="66" rx="5"/><text x="120" y="167">Update correlations</text><text class="concept-math" x="120" y="192">next iteration</text></g></svg>`;
-  for (const id of ['calculation-visual', 'animation-preview-visual']) {
-    const target = byId(id);
-    if (target) {
-      target.dataset.animation = 'loop';
-      target.innerHTML = loopGraphic.replaceAll('loop-arrow', `loop-arrow-${id}`);
-    }
-  }
-  if (byId('animation-preview-title')) byId('animation-preview-title').textContent = 'Self-consistency loop';
-  if (byId('animation-preview-description')) byId('animation-preview-description').textContent = 'The closure and the PRISM relation are applied repeatedly to update the correlations.';
-
   function wireDialog(dialogId, openId, closeId) {
     const dialog = byId(dialogId);
     if (!dialog) return;
@@ -27,7 +15,6 @@
       if (event.clientX < rect.left || event.clientX > rect.right || event.clientY < rect.top || event.clientY > rect.bottom) dialog.close();
     });
   }
-  wireDialog('animation-dialog', 'preview-convergence', 'close-animation');
   wireDialog('log-dialog', 'open-log', 'close-log');
   // These events describe what the browser actually observed, never inferred solver iterations.
   let eventSource = 'browser';
@@ -54,15 +41,14 @@
     if (!app) return;
     const state = app.dataset.state;
     const calculating = state === 'calculating';
-    const busy = calculating || state === 'retrieving';
-    if (byId('preview-convergence')) byId('preview-convergence').disabled = busy;
-    if (byId('calculation-visual')) byId('calculation-visual').classList.toggle('animation-paused', !calculating);
-    if (byId('conceptual-note')) byId('conceptual-note').textContent = state === 'retrieving' ? 'The calculation returned. Saved output files are being retrieved.' : 'Conceptual animation; its timing is independent of the solver.';
+    if (byId('calculation-visual')) byId('calculation-visual').dataset.active = String(calculating);
+    if (byId('conceptual-note')) byId('conceptual-note').textContent = calculating ? 'Conceptual animation; its timing is independent of the solver.' : state === 'retrieving' ? 'The calculation returned. Saved output files are being retrieved.' : 'Conceptual self-consistency loop.';
     if (state === lastState) return;
     lastState = state;
     if (eventSource !== 'browser') return;
     const messages = {
       ready: 'Interface ready. No calculation has been submitted in this page.',
+      preparing: 'Preparing the calculation request.',
       calculating: `Calculation request submitted. ${byId('run-parameters')?.textContent || ''}`,
       retrieving: 'The application returned a completion response. Retrieving result files.',
       complete: 'All result files were retrieved and validated by the interface.',

@@ -30,6 +30,61 @@
   let started = 0;
   let timer = null;
   let busy = false;
+  let activeModelRun = null;
+  let modelStatus = null;
+  let completedRows = null;
+
+  function convergenceText() {
+    if (!modelStatus) return 'Model convergence status unavailable.';
+    const count = modelStatus.converged.length;
+    const failed = modelStatus.failed.length;
+    const pending = modelStatus.pending.length;
+    const final = modelStatus.phase === 'complete';
+    const unavailable = modelStatus.source === 'unavailable' || (final && !modelStatus.anchored);
+    if (unavailable && !modelStatus.observedCount) return 'Model convergence status unavailable.';
+    if (!modelStatus.anchored) return 'Waiting for model outcomes.';
+    let text = `${count}/5 models converged`;
+    if (failed) text += `; ${failed} did not converge`;
+    if (pending && (final || unavailable)) text += `; ${pending} unconfirmed`;
+    return text + '.';
+  }
+  function renderModelStatus() {
+    const state = app.dataset.state;
+    const section = byId('model-run-summary');
+    section.hidden = !modelStatus || state === 'ready';
+    if (modelStatus) {
+      section.dataset.convergedCount = String(modelStatus.converged.length);
+      section.dataset.observedCount = String(modelStatus.observedCount);
+      section.dataset.source = modelStatus.source;
+      section.dataset.phase = modelStatus.phase;
+      const list = byId('model-status-list');
+      const unconfirmed = modelStatus.source === 'unavailable' || modelStatus.phase === 'complete';
+      const items = [0, 1, 2, 3, 4].map((id) => {
+        const item = document.createElement('li');
+        const outcome = modelStatus.converged.includes(id) ? 'converged' : modelStatus.failed.includes(id) ? 'failed' : unconfirmed ? 'unconfirmed' : 'pending';
+        item.dataset.model = String(id);
+        item.dataset.state = outcome;
+        const identity = document.createElement('strong');
+        identity.textContent = `Model ${id}`;
+        const label = document.createElement('span');
+        label.textContent = { converged: 'Converged', failed: 'Did not converge', unconfirmed: 'Unconfirmed', pending: 'Awaiting result' }[outcome];
+        item.append(identity, label);
+        return item;
+      });
+      list.replaceChildren(...items);
+      byId('model-status-note').textContent = modelStatus.note;
+    }
+    const convergence = convergenceText();
+    if (state === 'complete') byId('status-message').textContent = `Calculation complete. ${convergence} ${completedRows.toLocaleString('en-US')} rows of numerical data are ready to download.`;
+    else if (state === 'calculating') byId('status-message').textContent = `Calculating. ${convergence}`;
+    else if (state === 'retrieving') byId('status-message').textContent = `Retrieving result files. ${convergence}`;
+    else if (state === 'failed') byId('status-message').textContent = `No result is available from this attempt. ${convergence}`;
+  }
+  window.addEventListener('mlclosure:modelstatus', (event) => {
+    if (!activeModelRun || event.detail.runId !== activeModelRun.runId) return;
+    modelStatus = event.detail;
+    renderModelStatus();
+  });
 
   function storageRead(key) {
     try { return JSON.parse(sessionStorage.getItem(key)); } catch (_) { return null; }
@@ -74,10 +129,15 @@
     });
     byId('plot-panel').setAttribute('aria-labelledby', `tab-${key}`);
     byId('quantity-symbol').textContent = hasOutput ? detail.symbol : '→';
-    byId('quantity-description').textContent = hasOutput ? detail.description : 'Illustration of a polymer system. Run a state point to explore its correlation functions.';
-    image.src = paper?.url || outputURLs[key] || app.dataset.exampleSrc;
-    image.dataset.displayStyle = hasOutput ? (paper ? 'paper' : 'original') : 'illustration';
-    image.alt = hasOutput ? `${detail.title} ${detail.symbol}, ${parameterText(submitted)}${paper && key === 'c_k' ? '. Mean curve; original engine export includes ensemble uncertainty.' : ''}` : 'Polymer system illustration, not a calculated correlation plot';
+    byId('quantity-description').textContent = hasOutput ? detail.description : 'The self-consistency loop connects the ML closure with the PRISM relation. Run a state point to explore its correlation functions.';
+    image.hidden = !hasOutput;
+    byId('calculation-view').hidden = hasOutput;
+    app.dataset.hasOutput = String(hasOutput);
+    if (hasOutput) image.src = paper?.url || outputURLs[key];
+    else image.removeAttribute('src');
+    image.dataset.displayStyle = hasOutput ? (paper ? 'paper' : 'original') : 'none';
+    image.alt = hasOutput ? `${detail.title} ${detail.symbol}, ${parameterText(submitted)}${paper && key === 'c_k' ? '. Mean curve; original engine export includes ensemble uncertainty.' : ''}` : '';
+    byId('expand-figure').disabled = busy || !hasOutput;
     setLink(figureLink, paper?.url || outputURLs[key], `${filenamePrefix()}_${key}${paper ? '_paper' : ''}.${paper ? paper.extension : 'png'}`);
     byId('figure-metadata').textContent = hasOutput ? parameterText(submitted) : '';
     const styleNote = byId('plot-style-note');
@@ -105,7 +165,7 @@
     submit.disabled = value;
     fields.forEach((name) => { form.elements.namedItem(name).readOnly = value; });
     tabs.forEach((tab) => { tab.disabled = value || (!outputURLs[tab.dataset.plot] && tab.dataset.plot !== 'g_r'); });
-    byId('expand-figure').disabled = value;
+    byId('expand-figure').disabled = value || !outputURLs[selectedPlot];
     byId('calculation-overlay').hidden = !value;
     byId('plot-panel').setAttribute('aria-busy', String(value));
     submit.querySelector('.run-label').textContent = value ? 'Calculation in progress' : 'Run calculation';
@@ -134,12 +194,13 @@
     setBusy(false);
     app.dataset.state = 'failed';
     byId('result-badge').textContent = 'Run unsuccessful';
-    byId('figure-context').textContent = 'Polymer system illustration · no result from this attempt';
+    byId('figure-context').textContent = 'Self-consistency loop · no result from this attempt';
     byId('run-parameters').textContent = submitted ? `Attempted: ${parameterText(submitted)}` : 'No completed calculation';
     byId('status-message').textContent = 'No result is available from this attempt.';
     byId('error-title').textContent = title;
     byId('error-detail').textContent = message;
     byId('prediction-error').hidden = false;
+    renderModelStatus();
   }
 
   function validateData(text) {
@@ -163,6 +224,7 @@
     byId('working-title').textContent = 'Preparing your results';
     byId('working-description').textContent = 'Retrieving the five figures and numerical data.';
     byId('status-message').textContent = 'The calculation returned. Retrieving all result files…';
+    renderModelStatus();
     const keys = [...Object.keys(plots), 'data'];
     const token = `${Date.now()}-${Math.random().toString(36).slice(2)}`;
     const blobs = await Promise.all(keys.map(async (key) => {
@@ -222,9 +284,10 @@
     setBusy(false);
     byId('result-badge').textContent = 'Calculation complete';
     byId('run-parameters').textContent = parameterText(submitted);
-    byId('status-message').textContent = `Calculation complete. ${rows.toLocaleString('en-US')} rows of numerical data are ready to download.`;
+    completedRows = rows;
     // The completion hook is set last, once every output blob and visible control is ready.
     app.dataset.state = 'complete';
+    renderModelStatus();
   }
 
   form.addEventListener('invalid', (event) => {
@@ -250,9 +313,26 @@
     submitted = values;
     storageWrite('ml-closure-inputs', values);
     clearOutputs();
+    activeModelRun = null;
+    modelStatus = null;
+    completedRows = null;
     setBusy(true);
-    startTime();
+    app.dataset.state = 'preparing';
+    byId('model-run-summary').hidden = true;
+    byId('result-badge').textContent = 'Preparing';
+    byId('working-title').textContent = 'Preparing your calculation';
+    byId('working-description').textContent = 'Connecting to the local application.';
+    byId('elapsed-time').textContent = '00:00';
+    byId('status-message').textContent = 'Preparing the calculation…';
+    const statusAPI = window.MLClosureModelStatus;
+    if (statusAPI) {
+      try {
+        activeModelRun = await statusAPI.prepare();
+        modelStatus = statusAPI.snapshot();
+      } catch (_) { /* Optional terminal capture must not block the solver. */ }
+    }
     app.dataset.state = 'calculating';
+    startTime();
     byId('result-badge').textContent = 'Calculating';
     byId('working-title').textContent = 'Calculating your state point';
     byId('working-description').textContent = 'The closure is solving. Results will appear here.';
@@ -260,12 +340,16 @@
     byId('figure-metadata').textContent = parameterText(submitted);
     byId('run-parameters').textContent = `Submitted: ${parameterText(submitted)}`;
     byId('status-message').textContent = 'Calculating. Keep this tab open; this can take a few minutes.';
+    renderModelStatus();
     try {
       let response;
       try {
+        if (activeModelRun) statusAPI.begin(activeModelRun);
         response = await fetch(form.action, { method: 'POST', body, credentials: 'same-origin' });
       } catch (_) {
         throw new Error('The connection to the local application was interrupted. The calculation may still be running. Check the application before submitting again.');
+      } finally {
+        if (activeModelRun) statusAPI.complete(activeModelRun).catch(() => {});
       }
       if (!response.ok) throw new Error(`The application returned HTTP ${response.status}. This state point may not have converged, or the local application encountered an error. Check its output before trying another calculation.`);
       const returnedHTML = new DOMParser().parseFromString(await response.text(), 'text/html');
@@ -293,10 +377,11 @@
     if (anchor.getAttribute('aria-disabled') === 'true') event.preventDefault();
   }));
   byId('expand-figure').addEventListener('click', () => {
+    if (busy || !outputURLs[selectedPlot]) return;
     byId('expanded-image').src = image.src;
     byId('expanded-image').alt = image.alt;
-    byId('dialog-title').textContent = outputURLs[selectedPlot] ? `${plots[selectedPlot].title} · ${plots[selectedPlot].symbol}` : 'Polymer system illustration';
-    byId('expanded-caption').textContent = outputURLs[selectedPlot] ? parameterText(submitted) : 'Polymer system illustration · no calculation submitted';
+    byId('dialog-title').textContent = `${plots[selectedPlot].title} · ${plots[selectedPlot].symbol}`;
+    byId('expanded-caption').textContent = parameterText(submitted);
     dialog.showModal();
   });
   byId('close-figure').addEventListener('click', () => dialog.close());

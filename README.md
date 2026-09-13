@@ -54,29 +54,29 @@ Open the local URL printed by Flask, normally [http://127.0.0.1:5000](http://127
 
 Use one prediction at a time. Each calculation overwrites the same result filenames, so this version is intended for a single local user and is not prepared for concurrent public requests.
 
-The launch command captures real stdout/stderr while keeping it visible in the launching terminal. **Live terminal** opens a popup showing up to 500 captured lines. It can be opened during calculation to inspect actual engine messages; closing it stops the viewer polling. Terminal output is shown in this popup, with no inline feed.
+The launch command captures real stdout/stderr while keeping it visible in the launching terminal. **Live terminal** opens a popup showing up to 500 captured lines. It can be opened during calculation to inspect actual engine messages. Closing the popup hides the raw stream; per-model tracking continues until the current run’s final capture. With no active run, closing the popup stops polling. Raw terminal output is shown in this popup. A concise on-page summary reports the individual models’ observed convergence outcomes from the current run; it does not reproduce the raw log or invent iteration counts. It distinguishes partial ensemble convergence from all five models converging, and identifies unavailable or unverified status evidence.
 
 The existing Flask static route serves the generated log; no scientific code or route is modified. The viewer hides its own log requests and labels capture or connection failures explicitly. Output belongs to the whole local process and may include previous calculations. Existing engine messages report loading, model convergence, and exports; the disabled iteration-residual print statement is not enabled by this frontend. Running `python ML_closure.py` without capture leaves the popup clearly labeled as browser events. Terminal logs and generated predictions are ignored by Git. Keep this single-user local configuration private.
 
 ## Regression checks
 
-The latest **v1.0.6** interface refinement passed its three-state browser/model regression and focused presentation checks on September 13, 2026.
+The latest **v1.0.6** model-status and loop-presentation refinement passed its three-state browser/model regression and focused presentation checks.
 
 Three state points were selected before execution with Python's `random.Random(20260913)`: independent draws of integer `N` in [20, 100], uniform `epsilon` in [0, 0.5], and uniform `rho` in [0.2, 0.8], with the latter two rounded to three decimals.
 
 | Case | N | epsilon | rho | Original complete check (s) | Current browser check (s) |
 | --- | --- | --- | --- | --- | --- |
-| 1 | 32 | 0.311 | 0.671 | 74.62 | 65.19 |
-| 2 | 49 | 0.407 | 0.701 | 65.30 | 66.19 |
-| 3 | 67 | 0.188 | 0.399 | 24.21 | 26.45 |
+| 1 | 32 | 0.311 | 0.671 | 74.62 | 67.35 |
+| 2 | 49 | 0.407 | 0.701 | 65.30 | 66.83 |
+| 3 | 67 | 0.188 | 0.399 | 24.21 | 25.93 |
 
 These are observed wall times for the complete checks, not a performance benchmark or evidence of a speed improvement.
 
-All three cases completed with all five ensemble folds converged and finite 2,048 × 7 exported arrays. All **43,008 numeric values** matched the frozen references exactly, with zero maximum absolute difference. All **15 original engine PNGs** matched byte-for-byte and pixel-for-pixel. Ordered inputs, retained values, completed numeric downloads, all 15 SVG source/sample records and current-figure downloads, and the original c(k) uncertainty download were checked. Genuine engine messages appeared in the manually opened terminal popup before every calculation completed. The combined numerical/source/browser audit passed **310/310 checks**.
+All three cases completed with all five ensemble folds converged and finite 2,048 × 7 exported arrays. All **43,008 numeric values** matched the frozen references exactly, with zero maximum absolute difference. All **15 original engine PNGs** matched byte-for-byte and pixel-for-pixel. Ordered inputs, retained values, completed numeric downloads, all 15 SVG source/sample records and current-figure downloads, and the original c(k) uncertainty download were checked. In every case, Model 0's reported convergence appeared on the page while the calculation was still running and the terminal popup was closed; final 5/5 outcomes matched the engine log. The combined numerical/source/browser audit passed **319/319 checks**.
 
-Focused interface checks passed **28/28**, and terminal-popup lifecycle checks passed **24/24**. Desktop and phone renderings were visually inspected. Disclosure resize and reduced-motion checks passed **3/3**. The unchanged paper-style renderer retains its earlier **525/525** independent saved-data checks, including every source sample and plotted coordinate; those checks do not claim additional model runs.
+Focused interface checks passed **47/47**, and model-status parser/transport checks passed **72/72**. Those fixture checks cover partial, missing, stale, conflicting, and unavailable model-status evidence separately from the three real all-five-converged runs. The unchanged paper-style renderer retains its earlier **525/525** independent saved-data checks, including every source sample and plotted coordinate; those checks do not claim additional model runs.
 
-Preservation checks passed: all 702 files in the recorded author-owned inventory remained unchanged during this round. The protected scientific files and original requirements, selected PNG/TGA sources, exact copied PNG, and frozen reference archive were preserved. The frozen 19-file frontend matched the checkout, all three runtime copies, and the local preview. This evidence covers the three listed regression cases in the recorded environment, not new scientific accuracy or concurrent-hosting claims. See [VALIDATION.md](VALIDATION.md) for current and historical results, environment, and scope. Saved outputs and detailed audit records remain in the local review archive.
+Preservation checks passed: all **702** files in the recorded author-owned inventory retained their bytes and modification times. The **14** protected scientific files and original requirements, selected PNG/TGA sources, and sealed reference archive remained unchanged. All **20** frozen frontend files matched the checkout, three runtime copies, and preview. This evidence covers the three listed regression cases in the recorded environment, not new scientific accuracy or concurrent-hosting claims. See [VALIDATION.md](VALIDATION.md) for current and historical results, environment, and scope. Saved outputs and detailed audit records remain in the local review archive.
 
 ## Inputs and results
 
@@ -104,7 +104,7 @@ Numeric rows are whitespace-delimited even though the comment header contains co
 
 The standard scientific view draws these exact samples in the browser, following manuscript Figures 3–5: boxed axes, inward ticks, and a red ML curve. It applies no smoothing, resampling, or unit conversion. The state point appears in the figure toolbar, and the current figure downloads as SVG with source-data provenance. The c(k) view shows the mean only because per-fold uncertainty is absent from the numerical table. The data-details panel provides a separate download of the original c(k) PNG with its uncertainty band. The engine continues to export all five original PNGs, and the complete numerical download remains unchanged.
 
-A single self-consistency-loop animation accompanies calculation. It is conceptual and does not represent measured iteration counts, residuals, or completion percentages. The initial polymer illustration is an exact copy of the author-selected `val_3.png` rendering, not a calculated correlation plot. Manuscript-derived inline vector diagrams explain the architecture and PRISM workflow; the author’s original figures remain unchanged. The interface starts in dark mode when no preference is saved, respects a saved light-mode choice, and expands its detail sections smoothly.
+A static self-consistency loop appears before calculation and animates while a calculation runs. It replaces the initial polymer rendering in the idle view. The loop is conceptual and does not represent measured iteration counts, residuals, or completion percentages. Manuscript-derived inline vector diagrams explain the architecture and PRISM workflow; the author’s original figures remain unchanged. The interface starts in dark mode when no preference is saved, respects a saved light-mode choice, and expands its detail sections smoothly.
 
 The introductory comparison names the Percus–Yevick (PY), hypernetted-chain (HNC), and Modified Verlet (MV) atomic closures for the systems studied. These comparisons have different benchmark sets; the wording does not imply a universal ranking or expand the model’s scientific validation.
 

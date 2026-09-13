@@ -39,3 +39,25 @@ details[data-fold-animating]{overflow:hidden}.units-note{font-size:10px;line-hei
 [data-theme=dark] .concept-links,[data-theme=dark] .concept-graphic marker path{stroke:var(--gold)}
 [data-theme=dark] .loop-node rect{animation-name:loop-highlight-dark}
 @keyframes loop-highlight-dark{0%,20%,100%{fill:#111111;stroke:#c2ab6e}30%,45%{fill:#383323;stroke:#d6c18a}55%{fill:#111111;stroke:#c2ab6e}}
+/* One shared diagram is static before submission and animates only while calculating. */
+.solver-shell:not([data-has-output=true]) .figure-stage{background:var(--bg);border-color:var(--line)}
+#calculation-view{width:100%;min-height:430px;display:flex;flex-direction:column;align-items:center;justify-content:center;padding:31px 24px}
+#calculation-visual{width:min(100%,600px);margin:0 auto;opacity:1}
+#calculation-visual:not([data-active=true]) .loop-node rect{animation:none!important}
+#calculation-visual[data-active=true] .loop-node rect{animation-play-state:running}
+#calculation-overlay{position:static;inset:auto;padding:0;margin-top:20px;background:transparent;color:var(--ink)}
+#calculation-overlay h4{font-size:23px;margin-top:0}
+#calculation-overlay p{color:var(--muted);font-size:12px;max-width:440px;margin-top:8px}
+#calculation-overlay .elapsed{margin-top:12px;color:var(--gold-deep)}
+#conceptual-note{font-size:10px;line-height:1.7;color:var(--muted);max-width:480px;text-align:center;margin-top:18px}
+.model-run-summary{margin:0 0 18px;padding:14px 0;border-top:1px solid var(--line)}
+#model-status-list{display:grid;grid-template-columns:repeat(5,minmax(0,1fr));gap:8px;list-style:none;padding:0;margin:0}
+#model-status-list>li{min-width:0;display:flex;flex-direction:column;gap:5px;padding:9px 8px;border:1px solid var(--line);border-radius:3px;color:var(--muted);font-size:10px;line-height:1.45;background:var(--soft)}
+#model-status-list>li strong{font-size:10px;font-weight:550;color:var(--ink)}
+#model-status-list>li[data-state=loading]{border-color:var(--gold);color:var(--gold-deep)}
+#model-status-list>li[data-state=converged]{border-color:var(--success);color:var(--success)}
+#model-status-list>li[data-state=failed]{border-color:var(--error);color:var(--error)}
+#model-status-list>li[data-state=unavailable],#model-status-list>li[data-state=unconfirmed]{border-style:dashed;color:var(--muted)}
+#model-status-note{font-size:10px;line-height:1.7;color:var(--muted);margin-top:10px}
+@media(max-width:850px){#calculation-view{min-height:370px;padding:27px 20px}#calculation-visual{max-width:570px}}
+@media(max-width:650px){#calculation-view{min-height:310px;padding:24px 12px}#calculation-visual .concept-node text{font-size:18px}#calculation-visual .concept-node .concept-math{font-size:21px}#calculation-overlay{margin-top:18px}#calculation-overlay h4{font-size:20px}#calculation-overlay p{font-size:11px}#conceptual-note{font-size:9px;margin-top:16px}#model-status-list{grid-template-columns:repeat(3,minmax(0,1fr));gap:7px}#model-status-list>li{padding:8px;font-size:10px}#model-status-note{font-size:9px}.model-run-summary{padding-top:12px;margin-bottom:15px}}
