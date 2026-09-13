@@ -1,0 +1,14 @@
+# Project metadata only. Use the pinned environment in README.md and run from source.
+# No build backend, wheel, CLI entry point, or pip-installable package is declared.
+[project]
+name = "machine-learning-closure-prism"
+version = "1.1.0rc1"
+description = "Machine learning closure for polymer reference interaction site model (PRISM) integral equation theory"
+readme = "README.md"
+requires-python = "==3.9.23"
+authors = [{ name = "Zhihao Feng" }]
+keywords = ["PRISM", "polymer", "integral equation theory", "machine learning", "closure"]
+classifiers = ["Private :: Do Not Upload"]
+
+[project.urls]
+Repository = "https://github.com/fengzhihao77/machine-learning-closure-prism"

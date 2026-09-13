@@ -1,0 +1,13 @@
+cff-version: 1.2.0
+message: "If you use this software, cite the software and the related manuscript identified in README.md. This candidate is being prepared privately."
+type: software
+title: "Machine Learning Closure for PRISM"
+version: "1.1.0-rc.1"
+authors:
+  - family-names: "Feng"
+    given-names: "Zhihao"
+repository-code: "https://github.com/fengzhihao77/machine-learning-closure-prism"
+keywords:
+  - "PRISM"
+  - "polymer integral equation theory"
+  - "machine learning closure"
