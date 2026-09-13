@@ -1,0 +1,21 @@
+#!/usr/bin/env bash
+set -euo pipefail
+source_root="$(cd -- "$(dirname -- "${BASH_SOURCE[0]}")/.." && pwd)"
+science_env="${HOME}/.venvs/ml-closure-py39"
+build_cache="$(mktemp -d)"
+export UV_CACHE_DIR="${build_cache}"
+trap 'rm -rf -- "${build_cache}"' EXIT
+
+uv python install 3.9.23
+uv venv --python 3.9.23 "${science_env}"
+uv pip install --python "${science_env}/bin/python" --no-cache \
+  -r "${source_root}/requirements.txt" \
+  -c "${source_root}/deploy/constraints-reference-common.txt"
+uv pip install --python "${science_env}/bin/python" --no-cache --no-deps \
+  -r "${source_root}/deploy/requirements-web.txt"
+uv pip check --python "${science_env}/bin/python"
+"${science_env}/bin/python" -c 'import sys; assert sys.version_info[:3] == (3, 9, 23), sys.version'
+"${science_env}/bin/python" "${source_root}/deploy/install-browser.py"
+
+mkdir -p "${HOME}/.jupyter"
+cp "${source_root}/binder/jupyter_server_config.py" "${HOME}/.jupyter/jupyter_server_config.py"

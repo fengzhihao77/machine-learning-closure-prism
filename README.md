@@ -2,13 +2,13 @@
 
 An open-source, interactive Predictor for polymer structure using a machine learning closure for PRISM integral equation theory.
 
-## [Run the Predictor online](https://potential-acorn-w6qgjrw66vx37v7-7860.app.github.dev)
+## [Run the Predictor online](https://mybinder.org/v2/gh/fengzhihao77/machine-learning-closure-prism/dc077983e02724e0e1c1f8450bb5124244086e26?urlpath=predictor%2F)
 
 **Version: 1.0.6-rc.1** · [MIT license](LICENSE).
 
-Open the shared Predictor, enter a state point, and run a calculation. No installation or GitHub sign-in is required. The demo accepts one calculation at a time; if it is busy, try again shortly. Download your results promptly. They expire after one hour and are cleared if the server restarts.
+Binder opens a free, temporary Predictor session for you, with no installation or GitHub sign-in. Startup can take a few minutes. Enter a state point and run one calculation at a time; keep the tab open while it runs.
 
-The demo runs within the maintainer’s free Codespaces allowance and is available while its server is running. If it is offline, [create your own Codespace](https://codespaces.new/fengzhihao77/machine-learning-closure-prism) using your own GitHub allowance, or run locally below.
+Download results promptly: they expire after one hour, and Binder sessions shut down when idle or when their resource allowance is exhausted. Open the launch link again for a new session. Binder uses community compute rather than the maintainer’s GitHub quota. If Binder is busy, retry later, [create your own Codespace](https://codespaces.new/fengzhihao77/machine-learning-closure-prism), or run locally below.
 
 ## Run locally
 
@@ -26,7 +26,7 @@ python run.py
 
 Open [localhost:5000](http://127.0.0.1:5000) after launch. Other platforms can start from `requirements.txt` and require separate compatibility checks. Keep `ml_closure_models/` intact and run one prediction at a time.
 
-The Codespaces build completed three reference state-point checks. Numerical results can differ slightly from the macOS reference environment.
+Numerical results can vary across operating systems and processors. Use the recorded macOS environment above when reproducing its reference outputs.
 
 ## Citation
 

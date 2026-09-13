@@ -132,10 +132,10 @@
 
     <section id="solver" class="solver-section wrap" aria-labelledby="solver-title">
       <div class="section-heading"><div><h2 id="solver-title">Solve PRISM self-consistently</h2></div></div>
-      <div class="solver-shell" data-ml-app data-has-output="false" data-state="ready" data-server-success="{{ 'true' if pred_text else 'false' }}">
+      <div class="solver-shell" data-ml-app data-base-url="{{ request.script_root }}/" data-has-output="false" data-state="ready" data-server-success="{{ 'true' if pred_text else 'false' }}">
         <aside class="parameter-panel" aria-labelledby="parameters-title">
           <h3 id="parameters-title">Define a state point</h3><p class="panel-description">Inputs use Lennard–Jones reduced units.</p>
-          <form id="prediction-form" action="/api/runs" method="post">
+          <form id="prediction-form" action="{{ url_for('allocate_run') }}" method="post">
             <div class="field-group"><label for="chain-length"><span>Chain length</span><span class="field-symbol" aria-hidden="true">N</span></label><input id="chain-length" type="number" inputmode="numeric" name="N" value="{{ request.form.get('N', '') }}" min="20" max="100" step="1" placeholder="20–100" required aria-describedby="chain-help" autocomplete="off"><p class="field-help" id="chain-help">20 to 100 · integer beads per chain</p></div>
             <div class="field-group"><label for="well-depth"><span>Interaction strength</span><span class="field-symbol" aria-hidden="true">ε</span></label><input id="well-depth" type="number" inputmode="decimal" name="epsilon" value="{{ request.form.get('epsilon', '') }}" min="0" max="0.5" step="any" placeholder="0.0–0.5" required aria-describedby="epsilon-help" autocomplete="off"><p class="field-help" id="epsilon-help">0.0 to 0.5 · in units of <i>k</i><sub>B</sub><i>T</i></p></div>
             <div class="field-group"><label for="number-density"><span>Number density</span><span class="field-symbol" aria-hidden="true">ρ</span></label><input id="number-density" type="number" inputmode="decimal" name="rho" value="{{ request.form.get('rho', '') }}" min="0.2" max="0.8" step="any" placeholder="0.2–0.8" required aria-describedby="density-help" autocomplete="off"><p class="field-help" id="density-help">0.2 to 0.8 · bead number density in σ<sup>−3</sup></p></div>

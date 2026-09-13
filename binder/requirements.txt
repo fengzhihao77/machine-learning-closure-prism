@@ -1,0 +1,3 @@
+# Binder's launcher is separate from the scientific Python environment.
+jupyter-server-proxy==4.5.0
+uv==0.12.13
