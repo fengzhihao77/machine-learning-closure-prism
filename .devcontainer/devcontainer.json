@@ -1,6 +1,6 @@
 {
   "name": "ML Closure private preview",
-  "image": "mcr.microsoft.com/devcontainers/universal:6.1.7-noble",
+  "image": "mcr.microsoft.com/devcontainers/base:ubuntu-24.04@sha256:d94c97dd9cacf183d0a6fd12a8e87b526e9e928307674ae9c94139139c0c6eae",
   "features": {
     "ghcr.io/devcontainers/features/python:1": {
       "version": "3.9.23",
@@ -9,7 +9,7 @@
       "useOryxIfAvailable": false
     }
   },
-  "remoteUser": "codespace",
+  "remoteUser": "vscode",
   "runArgs": [
     "--shm-size=256m"
   ],
