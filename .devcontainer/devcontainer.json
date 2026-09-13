@@ -1,0 +1,42 @@
+{
+  "name": "ML Closure private preview",
+  "image": "mcr.microsoft.com/devcontainers/universal:6.1.7-noble",
+  "features": {
+    "ghcr.io/devcontainers/features/python:1": {
+      "version": "3.9.23",
+      "installTools": false,
+      "installJupyterlab": false,
+      "useOryxIfAvailable": false
+    }
+  },
+  "remoteUser": "codespace",
+  "runArgs": [
+    "--shm-size=256m"
+  ],
+  "hostRequirements": {
+    "cpus": 2,
+    "memory": "8gb"
+  },
+  "forwardPorts": [
+    7860
+  ],
+  "portsAttributes": {
+    "7860": {
+      "label": "ML Closure private preview",
+      "onAutoForward": "openBrowser"
+    }
+  },
+  "containerEnv": {
+    "PYTHONDONTWRITEBYTECODE": "1",
+    "PYTHONUNBUFFERED": "1",
+    "BOKEH_IN_DOCKER": "1",
+    "OMP_NUM_THREADS": "1",
+    "OPENBLAS_NUM_THREADS": "1",
+    "VECLIB_MAXIMUM_THREADS": "1",
+    "TF_NUM_INTRAOP_THREADS": "1",
+    "TF_NUM_INTEROP_THREADS": "1",
+    "TF_CPP_MIN_LOG_LEVEL": "2"
+  },
+  "postCreateCommand": "bash deploy/setup-codespace.sh",
+  "postStartCommand": "bash deploy/auto-start-codespace.sh"
+}

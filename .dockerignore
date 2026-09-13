@@ -1,0 +1,19 @@
+# Explicit deployment allowlist; no git metadata, private notes, demos, or caches.
+**
+!Dockerfile
+!requirements.txt
+!deploy/
+!deploy/constraints-reference-common.txt
+!run.py
+!ml_closure_models/
+!ml_closure_models/**
+!templates/
+!templates/**
+!static/
+!static/**
+**/__pycache__/
+**/*.pyc
+**/.DS_Store
+**/*.pptx
+static/pred_results/**
+static/pred_results/

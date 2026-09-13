@@ -1,15 +1,17 @@
-# Local environments and Python caches
+# Python environments and caches
 .venv/
 venv/
 __pycache__/
 *.py[cod]
 .DS_Store
+.env
+.env.*
 
-# Internal material is excluded from the release tree
-*.pptx
-*.ppt
+# Local notebooks and slides
 *.ipynb
+*.ppt
+*.pptx
 
-# Runtime predictions are generated locally
+# Generated prediction files
 static/pred_results/*
 !static/pred_results/.gitkeep
