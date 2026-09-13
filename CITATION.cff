@@ -1,8 +1,9 @@
 cff-version: 1.2.0
-message: "If you use this software, cite the software and the related manuscript identified in README.md. This software is currently maintained privately."
+message: "If you use this software, cite the software and the related manuscript identified in README.md."
 type: software
 title: "Machine Learning Closure for PRISM"
 version: "1.0.6-rc.1"
+license: MIT
 authors:
   - family-names: "Feng"
     given-names: "Zhihao"

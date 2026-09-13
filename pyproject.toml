@@ -7,8 +7,9 @@ description = "Machine learning closure for polymer reference interaction site m
 readme = "README.md"
 requires-python = "==3.9.23"
 authors = [{ name = "Zhihao Feng" }]
+license = "MIT"
+license-files = ["LICENSE"]
 keywords = ["PRISM", "polymer", "integral equation theory", "machine learning", "closure"]
-classifiers = ["Private :: Do Not Upload"]
 
 [project.urls]
 Repository = "https://github.com/fengzhihao77/machine-learning-closure-prism"

@@ -1,12 +1,14 @@
 # Machine Learning Closure for PRISM
 
-An interactive Predictor for polymer structure using a machine learning closure for PRISM integral equation theory.
+An open-source, interactive Predictor for polymer structure using a machine learning closure for PRISM integral equation theory.
 
-## [Open the Predictor](https://ml-closure-predictor-g9v7w4g9jvq3pgg7-7860.app.github.dev)
+## [Run the Predictor online](https://codespaces.new/fengzhihao77/machine-learning-closure-prism)
 
-**Version: 1.0.6-rc.1** · Private, on-demand Codespaces preview.
+**Version: 1.0.6-rc.1** · [MIT license](LICENSE).
 
-Requires the Codespace owner’s GitHub sign-in. The owner can [resume the Codespace](https://ml-closure-predictor-g9v7w4g9jvq3pgg7.github.dev) when stopped; other users with repository access can [create their own Codespace](https://codespaces.new/fengzhihao77/machine-learning-closure-prism). This preview is configured to stop after 10 idle minutes and delete its Codespace after 7 inactive days; the GitHub repository is preserved. Included free usage depends on your account and remaining quota.
+Sign in to GitHub and create your own Codespace using the link above. After setup, the Predictor opens on forwarded port 7860. Each Codespace uses its owner's compute and storage allowance; included free usage depends on your account and remaining quota. You can also run locally below.
+
+The maintainer's existing [preview](https://ml-closure-predictor-g9v7w4g9jvq3pgg7-7860.app.github.dev) and [resume link](https://ml-closure-predictor-g9v7w4g9jvq3pgg7.github.dev) remain private to the maintainer. That preview stops after 10 idle minutes and expires after 7 inactive days; the public repository is preserved.
 
 ## Run locally
 
@@ -32,6 +34,6 @@ The Codespaces build completed three reference state-point checks. Numerical res
 
 ## History
 
-Created **February 2, 2023**, with the original history preserved. [Commit history](https://github.com/fengzhihao77/machine-learning-closure-prism/commits/main/) · [Changelog](CHANGELOG.md).
+Created **February 2, 2023**. [Commit history](https://github.com/fengzhihao77/machine-learning-closure-prism/commits/main/) · [Changelog](CHANGELOG.md).
 
-The repository is private; a software license has not yet been selected.
+Released under the [MIT license](LICENSE).
