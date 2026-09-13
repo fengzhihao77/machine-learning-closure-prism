@@ -28,3 +28,14 @@ html.enhanced-navigation{scroll-behavior:auto}
 details[data-fold-animating]{overflow:hidden}.units-note{font-size:10px;line-height:1.7;color:var(--muted);margin-top:17px}.field-help sub,.field-help sup{font-size:75%;line-height:0}.animation-options #preview-convergence{font-size:10px}.panel-description{max-width:240px}
 @media(max-width:850px){.panel-description{max-width:none}.units-note{text-align:center;margin-top:14px}}
 @media(max-width:650px){.units-note{margin-top:14px}.animation-options #preview-convergence{font-size:10px}}
+
+/* Neutral black surfaces in dark mode; retain gold accents and scientific image colors. */
+[data-theme=dark] .figure-dialog::backdrop,[data-theme=dark] .experience-dialog::backdrop{background:rgba(0,0,0,.78)}
+[data-theme=dark] .calculation-overlay{background:rgba(17,17,17,.98);color:var(--ink)}
+[data-theme=dark] .calculation-overlay p,[data-theme=dark] .conceptual-note{color:var(--muted)}
+[data-theme=dark] .animation-dialog .calculation-visual{background:var(--bg)}
+[data-theme=dark] .concept-node rect{fill:var(--surface);stroke:var(--gold)}
+[data-theme=dark] .concept-node text{fill:var(--ink)}
+[data-theme=dark] .concept-links,[data-theme=dark] .concept-graphic marker path{stroke:var(--gold)}
+[data-theme=dark] .loop-node rect{animation-name:loop-highlight-dark}
+@keyframes loop-highlight-dark{0%,20%,100%{fill:#111111;stroke:#c2ab6e}30%,45%{fill:#383323;stroke:#d6c18a}55%{fill:#111111;stroke:#c2ab6e}}

@@ -2,6 +2,12 @@
 
 ## 1.0.6 — 2026-09-13 (current software version; private preparation)
 
+### Neutral-black theme refinement
+
+- Replaced the green-tinted dark palette with neutral black tones. This is a presentation-color refinement; software version remains `1.0.6`.
+- Passed 17/17 focused visual checks and 310/310 checks from the same three actual browser/model runs: all 43,008 numeric values and 15 original PNGs matched the frozen references exactly. Light-mode rules and gold accents were preserved.
+- Application preservation and all 702 recorded author-file checksums/timestamps passed. The 19 frozen frontend files matched the checkout, three runtime copies, and preview. Earlier results below describe the preceding interface.
+
 ### Latest interface refinement
 
 - Replaced the initial illustration with an exact copy of the author-selected `val_3.png` polymer rendering, preserving the source image.

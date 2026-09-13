@@ -306,7 +306,7 @@
     const dark = document.documentElement.dataset.theme === 'dark';
     themeToggle.setAttribute('aria-label', `Switch to ${dark ? 'light' : 'dark'} theme`);
     themeToggle.title = themeToggle.getAttribute('aria-label');
-    document.querySelector('meta[name="theme-color"]').content = dark ? '#151713' : '#f5f2ea';
+    document.querySelector('meta[name="theme-color"]').content = dark ? '#000000' : '#f5f2ea';
   }
   themeToggle.addEventListener('click', () => {
     const theme = document.documentElement.dataset.theme === 'dark' ? 'light' : 'dark';
