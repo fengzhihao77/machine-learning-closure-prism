@@ -22,6 +22,11 @@
   };
   let outputURLs = {};
   let selectedPlot = 'g_r';
+  let paperPlots = null;
+  let preferredStyle = 'paper';
+  let plotStyle = 'paper';
+  let renderWarning = '';
+  const styleButtons = [...app.querySelectorAll('[data-plot-style]')];
   let submitted = null;
   let started = 0;
   let timer = null;
@@ -53,32 +58,54 @@
       anchor.removeAttribute('download');
     }
   }
+  function updateStyleControls() {
+    styleButtons.forEach((button) => {
+      button.setAttribute('aria-pressed', String(button.dataset.plotStyle === plotStyle));
+      button.disabled = busy || !outputURLs[selectedPlot] || (button.dataset.plotStyle === 'paper' && !paperPlots);
+    });
+    app.dataset.plotStyle = plotStyle;
+  }
   function setPlot(key) {
     if (!(key in plots)) return;
     if (!outputURLs[key] && key !== 'g_r') return;
     selectedPlot = key;
     const detail = plots[key];
+    const hasOutput = Boolean(outputURLs[key]);
+    const paper = hasOutput && plotStyle === 'paper' ? paperPlots?.plots[key] : null;
     tabs.forEach((tab) => {
       const active = tab.dataset.plot === key;
       tab.setAttribute('aria-selected', String(active));
       tab.tabIndex = active ? 0 : -1;
     });
     byId('plot-panel').setAttribute('aria-labelledby', `tab-${key}`);
-    byId('quantity-symbol').textContent = outputURLs[key] ? detail.symbol : '→';
-    byId('quantity-description').textContent = outputURLs[key] ? detail.description : 'Illustration of a polymer system. Run a state point to explore its correlation functions.';
-    image.src = outputURLs[key] || app.dataset.exampleSrc;
-    image.alt = outputURLs[key] ? `${detail.title} ${detail.symbol}, ${parameterText(submitted)}` : 'Polymer system illustration, not a calculated correlation plot';
-    setLink(figureLink, outputURLs[key], `${filenamePrefix()}_${key}.png`);
+    byId('quantity-symbol').textContent = hasOutput ? detail.symbol : '→';
+    byId('quantity-description').textContent = hasOutput ? detail.description : 'Illustration of a polymer system. Run a state point to explore its correlation functions.';
+    image.src = paper?.url || outputURLs[key] || app.dataset.exampleSrc;
+    image.dataset.displayStyle = hasOutput ? (paper ? 'paper' : 'original') : 'illustration';
+    image.alt = hasOutput ? `${detail.title} ${detail.symbol}, ${parameterText(submitted)}${paper && key === 'c_k' ? '. Mean curve; original engine export includes ensemble uncertainty.' : ''}` : 'Polymer system illustration, not a calculated correlation plot';
+    setLink(figureLink, paper?.url || outputURLs[key], `${filenamePrefix()}_${key}${paper ? '_paper' : ''}.${paper ? paper.extension : 'png'}`);
+    byId('figure-metadata').textContent = hasOutput ? parameterText(submitted) : '';
+    const styleNote = byId('plot-style-note');
+    styleNote.hidden = !hasOutput;
+    styleNote.textContent = renderWarning || (paper && key === 'c_k' ? 'Mean curve · original export includes ensemble uncertainty.' : paper ? 'Paper style renders the exported numerical samples.' : key === 'c_k' ? 'Original engine export, including the ensemble uncertainty band.' : 'Original PNG exported by the engine.');
+    if (hasOutput) byId('figure-context').textContent = paper ? 'Paper-style plot' : 'Original engine plot';
+    updateStyleControls();
+    if (hasOutput) window.dispatchEvent(new CustomEvent('mlclosure:plotchange', { detail: { quantity: key, style: paper ? 'paper' : 'original', imageURL: image.src, sourceHash: paperPlots?.sourceHash || null } }));
   }
   function clearOutputs() {
     Object.values(outputURLs).forEach((url) => URL.revokeObjectURL(url));
+    if (paperPlots) paperPlots.dispose();
+    paperPlots = null;
     outputURLs = {};
+    renderWarning = '';
+    app.dataset.sourceHash = '';
     setLink(dataLink, null);
     setLink(figureLink, null);
     setPlot('g_r');
   }
   function setBusy(value) {
     busy = value;
+    updateStyleControls();
     submit.disabled = value;
     fields.forEach((name) => { form.elements.namedItem(name).readOnly = value; });
     tabs.forEach((tab) => { tab.disabled = value || (!outputURLs[tab.dataset.plot] && tab.dataset.plot !== 'g_r'); });
@@ -156,7 +183,8 @@
       }
       return blob;
     }));
-    const rows = validateData(await blobs[keys.indexOf('data')].text());
+    const dataText = await blobs[keys.indexOf('data')].text();
+    const rows = validateData(dataText);
     const nextURLs = Object.fromEntries(keys.map((key, index) => [key, URL.createObjectURL(blobs[index])]));
     try {
       await Promise.all(Object.keys(plots).map((key) => new Promise((resolve, reject) => {
@@ -169,14 +197,33 @@
       Object.values(nextURLs).forEach((url) => URL.revokeObjectURL(url));
       throw error;
     }
+    let nextPaperPlots = null;
+    let nextRenderWarning = '';
+    try {
+      if (!window.MLScientificPlots?.render) throw new Error('Paper-style renderer is unavailable.');
+      nextPaperPlots = await window.MLScientificPlots.render(dataText);
+      await Promise.all(Object.keys(plots).map((key) => new Promise((resolve, reject) => {
+        const probe = new Image();
+        probe.onload = resolve;
+        probe.onerror = () => reject(new Error('Paper-style image could not be displayed.'));
+        probe.src = nextPaperPlots.plots[key].url;
+      })));
+    } catch (_) {
+      if (nextPaperPlots) nextPaperPlots.dispose();
+      nextPaperPlots = null;
+      nextRenderWarning = 'Paper-style plotting is unavailable. Original engine figures are shown.';
+    }
     clearOutputs();
     outputURLs = nextURLs;
+    paperPlots = nextPaperPlots;
+    renderWarning = nextRenderWarning;
+    plotStyle = paperPlots ? preferredStyle : 'original';
+    app.dataset.sourceHash = paperPlots?.sourceHash || '';
     setPlot('g_r');
     setLink(dataLink, outputURLs.data, `${filenamePrefix()}_data.txt`);
     stopTime();
     setBusy(false);
     byId('result-badge').textContent = 'Calculation complete';
-    byId('figure-context').textContent = 'Your calculated output · original engine figure';
     byId('run-parameters').textContent = parameterText(submitted);
     byId('status-message').textContent = `Calculation complete. ${rows.toLocaleString('en-US')} rows of numerical data are ready to download.`;
     // The completion hook is set last, once every output blob and visible control is ready.
@@ -213,6 +260,7 @@
     byId('working-title').textContent = 'Calculating your state point';
     byId('working-description').textContent = 'The closure is solving. Results will appear here.';
     byId('figure-context').textContent = 'A new calculation is in progress';
+    byId('figure-metadata').textContent = parameterText(submitted);
     byId('run-parameters').textContent = `Submitted: ${parameterText(submitted)}`;
     byId('status-message').textContent = 'Calculating. Keep this tab open; this can take a few minutes.';
     try {
@@ -230,6 +278,13 @@
       fail(error.message || 'The result files could not be retrieved. Check the local application before trying again.');
     }
   });
+
+  styleButtons.forEach((button) => button.addEventListener('click', () => {
+    if (busy || !outputURLs[selectedPlot] || (button.dataset.plotStyle === 'paper' && !paperPlots)) return;
+    preferredStyle = button.dataset.plotStyle;
+    plotStyle = preferredStyle;
+    setPlot(selectedPlot);
+  }));
 
   tabs.forEach((tab, index) => {
     tab.addEventListener('click', () => setPlot(tab.dataset.plot));

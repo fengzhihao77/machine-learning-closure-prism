@@ -1,5 +1,15 @@
 # Changelog
 
+## Unreleased — private candidate refinements
+
+- Added manuscript Figures 1 and 2 as exact image copies with full-resolution viewing, a QHO-inspired presentation mark, preprint links, and three selectable conceptual animations. Their timing does not represent solver progress.
+- Added paper-style SVG plots using every exported sample without smoothing, resampling, or unit conversion. SVG provenance records the source-data hash and all sample pairs. The original engine PNGs remain available; c(k) shows only the mean because its source table contains no fold uncertainty.
+- Added an optional live terminal view of captured process stdout/stderr through the existing Flask static-file route. It uses plaintext, identifies unavailable or stale output, and falls back to clearly labeled browser events. No Python source or backend route changed.
+- Repeated the same three actual browser/model regressions: all 43,008 numeric values had zero maximum difference, and all 15 original PNGs remained identical in bytes and pixels. The combined audit passed 304/304 checks. Real terminal output was observed before completion in all three runs.
+- Passed 525 independent saved-data SVG checks and 56 mocked UI checks. After the full runs, a terminal-dialog close/reopen race was fixed and verified by 21 focused browser checks without rerunning the model. See [VALIDATION.md](VALIDATION.md) for the sequence and scope.
+
+These refinements follow the existing `v1.1.0-rc.1` tag. The tag is retained at its original commit; no replacement tag or public release is implied.
+
 ## 1.1.0-rc.1 — 2026-09-13 (private candidate)
 
 - Prepared the current application in the renamed private `machine-learning-closure-prism` repository, retaining its February 2, 2023 creation date and existing Git history.
