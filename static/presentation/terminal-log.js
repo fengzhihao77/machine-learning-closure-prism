@@ -186,13 +186,27 @@
     emit();
     setState('browser');
   }
+  function applicationBasePath() {
+    const path = app.dataset.baseUrl || '/';
+    if (path.length > 2048 || !/^\/(?:[A-Za-z0-9_~.-]+\/)*$/.test(path) ||
+        path.split('/').some((part) => part === '.' || part === '..')) {
+      throw new Error('The application has an invalid hosting address.');
+    }
+    const base = new URL(path, location.href);
+    if (base.href !== location.origin + path || !new URL(location.href).pathname.startsWith(path)) {
+      throw new Error('The application is outside its configured hosting address.');
+    }
+    return path;
+  }
   async function prepare(logURL) {
     reset();
     stop();
     if (typeof logURL !== 'string') throw new Error('A calculation-specific terminal address is required.');
+    const basePath = applicationBasePath();
     const nextURL = new URL(logURL, location.href);
     if (nextURL.origin !== location.origin || nextURL.username || nextURL.password || nextURL.href !== nextURL.origin + nextURL.pathname ||
-        !/^\/api\/runs\/[A-Za-z0-9_-]{43}\/terminal\.log$/.test(nextURL.pathname)) {
+        !nextURL.pathname.startsWith(basePath) ||
+        !/^\/api\/runs\/[A-Za-z0-9_-]{43}\/terminal\.log$/.test(nextURL.pathname.slice(basePath.length - 1))) {
       throw new Error('The terminal address does not identify an isolated calculation.');
     }
     url = nextURL;

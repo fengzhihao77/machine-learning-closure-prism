@@ -237,21 +237,35 @@
 
   function validateJobURLs(payload) {
     if (!payload || typeof payload !== 'object') throw new Error('The calculation service returned an invalid run.');
+    const basePath = applicationBasePath();
     const names = ['predict_url', 'output_base', 'log_url'];
     const urls = Object.fromEntries(names.map((name) => {
       if (typeof payload[name] !== 'string') throw new Error('The calculation service did not provide an isolated run.');
       const url = new URL(payload[name], location.href);
-      if (url.origin !== location.origin || url.username || url.password || url.href !== url.origin + url.pathname) {
+      if (url.origin !== location.origin || url.username || url.password || url.href !== url.origin + url.pathname ||
+          !url.pathname.startsWith(basePath)) {
         throw new Error('The calculation service returned an unexpected run address.');
       }
       return [name, url];
     }));
-    const match = /^\/api\/runs\/([A-Za-z0-9_-]{43})\/predict$/.exec(urls.predict_url.pathname);
-    if (!match || urls.output_base.pathname !== `/api/runs/${match[1]}/files/` ||
-        urls.log_url.pathname !== `/api/runs/${match[1]}/terminal.log`) {
+    const match = /^\/api\/runs\/([A-Za-z0-9_-]{43})\/predict$/.exec(urls.predict_url.pathname.slice(basePath.length - 1));
+    if (!match || urls.output_base.pathname !== `${basePath}api/runs/${match[1]}/files/` ||
+        urls.log_url.pathname !== `${basePath}api/runs/${match[1]}/terminal.log`) {
       throw new Error('The calculation addresses do not belong to the same isolated run.');
     }
     return Object.freeze({ predictURL: urls.predict_url.href, outputBase: urls.output_base.href, logURL: urls.log_url.href });
+  }
+  function applicationBasePath() {
+    const path = app.dataset.baseUrl || '/';
+    if (path.length > 2048 || !/^\/(?:[A-Za-z0-9_~.-]+\/)*$/.test(path) ||
+        path.split('/').some((part) => part === '.' || part === '..')) {
+      throw new Error('The application has an invalid hosting address.');
+    }
+    const base = new URL(path, location.href);
+    if (base.href !== location.origin + path || !new URL(location.href).pathname.startsWith(path)) {
+      throw new Error('The application is outside its configured hosting address.');
+    }
+    return path;
   }
   function requireResponseURL(response, expected) {
     if (response.url !== expected || response.redirected) {
@@ -265,7 +279,7 @@
     return new Error(`The calculation service returned HTTP ${status}. Please try again later.`);
   }
   async function allocateJob() {
-    const url = new URL('/api/runs', location.href).href;
+    const url = new URL(`${applicationBasePath()}api/runs`, location.href).href;
     const response = await fetch(url, { method: 'POST', credentials: 'same-origin', cache: 'no-store', redirect: 'error', headers: { Accept: 'application/json' } });
     requireResponseURL(response, url);
     if (!response.ok) throw serviceError(response.status);

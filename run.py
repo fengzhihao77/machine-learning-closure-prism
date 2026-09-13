@@ -29,6 +29,33 @@ RUN_PREDICT_PATH = re.compile(r'^/api/runs/[A-Za-z0-9_-]{43}/predict$')
 OUTPUT_FILES = ('g_r.png', 'h_k.png', 'w_k.png', 'c_k.png', 's_k.png', 'pred_data.txt')
 
 
+def validate_base_url(value):
+    """Accept only a canonical path supplied by the deployment configuration."""
+    if (not isinstance(value, str) or len(value) > 2048
+            or not re.fullmatch(r'/(?:[A-Za-z0-9_~.-]+/)*', value)
+            or any(part in ('.', '..') for part in value.split('/'))):
+        raise ValueError('ML_CLOSURE_BASE_URL must be an absolute path ending in / '
+                         'with no empty, encoded, or dot path segments.')
+    return value
+
+
+class BaseURLWSGI:
+    """Set the known proxy mount; the proxy already strips it from PATH_INFO.
+
+    This is configured at launch, never inferred from a visitor's headers.
+    The empty SCRIPT_NAME retains ordinary root hosting.
+    """
+
+    def __init__(self, application, base_url='/'):
+        self.application = application
+        self.script_name = validate_base_url(base_url).rstrip('/')
+
+    def __call__(self, environ, start_response):
+        mounted = environ.copy()
+        mounted['SCRIPT_NAME'] = self.script_name
+        return self.application(mounted, start_response)
+
+
 class KeepAliveWSGI:
     """Keep a long prediction response active without changing the engine.
 
@@ -412,7 +439,7 @@ def install_run_api(app, output_dir, jobs_dir, *, capture_output=True,
                     ttl_seconds=3600, max_jobs=32, max_log_bytes=1048576,
                     max_output_bytes=8388608):
     """Expose isolated, single-use runs around the unchanged predict function."""
-    from flask import abort, jsonify, request, send_file
+    from flask import abort, jsonify, request, send_file, url_for
 
     original_predict = app.view_functions['predict']
     original_static = app.view_functions.get('static')
@@ -462,9 +489,9 @@ def install_run_api(app, output_dir, jobs_dir, *, capture_output=True,
             job = registry.allocate()
         except OverflowError as error:
             return jsonify(error=str(error)), 429
-        prefix = '/api/runs/' + job['token']
-        return jsonify(predict_url=prefix + '/predict', output_base=prefix + '/files/',
-                       log_url=prefix + '/terminal.log'), 201
+        return jsonify(predict_url=url_for('predict_run', token=job['token']),
+                       output_base=url_for('run_file', token=job['token'], filename=''),
+                       log_url=url_for('run_terminal', token=job['token'])), 201
 
     @app.route('/api/runs/<token>/predict', methods=['POST'])
     def predict_run(token):
@@ -555,6 +582,7 @@ def create_app(runtime_dir=None, capture_output=True):
     empty; by default a new temporary directory is created. The process stays
     in that directory because the original engine resolves files from cwd.
     Set capture_output=False to disable per-run Python terminal capture.
+    ML_CLOSURE_BASE_URL sets a trusted proxy mount path, defaulting to /.
     """
     global _app
     if _app is not None:
@@ -562,6 +590,7 @@ def create_app(runtime_dir=None, capture_output=True):
             raise RuntimeError('Use a separate process for a different runtime directory.')
         return _app
 
+    base_url = validate_base_url(os.environ.get('ML_CLOSURE_BASE_URL', '/'))
     bundle = ROOT / 'ml_closure_models'
     requested = runtime_dir or os.environ.get('ML_CLOSURE_RUNTIME_DIR')
     runtime = Path(requested).expanduser().resolve() if requested else Path(tempfile.mkdtemp(prefix='ml-closure-'))
@@ -594,7 +623,7 @@ def create_app(runtime_dir=None, capture_output=True):
     app.jinja_loader = FileSystemLoader(app.template_folder)
 
     install_run_api(app, output, runtime / 'runs', capture_output=capture_output)
-    app.wsgi_app = KeepAliveWSGI(app.wsgi_app)
+    app.wsgi_app = BaseURLWSGI(KeepAliveWSGI(app.wsgi_app), base_url)
     app.config['ML_CLOSURE_RUNTIME_DIR'] = str(runtime)
     app.extensions['ml_closure_runtime'] = {'directory': runtime, 'output_dir': output, 'engine': engine}
     _app = app
