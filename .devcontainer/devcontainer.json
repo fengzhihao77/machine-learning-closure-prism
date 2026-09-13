@@ -1,0 +1,42 @@
+{
+  "name": "ML Closure private preview",
+  "image": "mcr.microsoft.com/devcontainers/base:ubuntu-24.04@sha256:d94c97dd9cacf183d0a6fd12a8e87b526e9e928307674ae9c94139139c0c6eae",
+  "features": {
+    "ghcr.io/devcontainers/features/python:1": {
+      "version": "3.9.23",
+      "installTools": false,
+      "installJupyterlab": false,
+      "useOryxIfAvailable": false
+    }
+  },
+  "remoteUser": "vscode",
+  "runArgs": [
+    "--shm-size=256m"
+  ],
+  "hostRequirements": {
+    "cpus": 2,
+    "memory": "8gb"
+  },
+  "forwardPorts": [
+    7860
+  ],
+  "portsAttributes": {
+    "7860": {
+      "label": "ML Closure private preview",
+      "onAutoForward": "openBrowser"
+    }
+  },
+  "containerEnv": {
+    "PYTHONDONTWRITEBYTECODE": "1",
+    "PYTHONUNBUFFERED": "1",
+    "BOKEH_IN_DOCKER": "1",
+    "OMP_NUM_THREADS": "1",
+    "OPENBLAS_NUM_THREADS": "1",
+    "VECLIB_MAXIMUM_THREADS": "1",
+    "TF_NUM_INTRAOP_THREADS": "1",
+    "TF_NUM_INTEROP_THREADS": "1",
+    "TF_CPP_MIN_LOG_LEVEL": "2"
+  },
+  "postCreateCommand": "bash deploy/setup-codespace.sh",
+  "postStartCommand": "bash deploy/auto-start-codespace.sh"
+}

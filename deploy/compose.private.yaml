@@ -1,0 +1,16 @@
+# Local, single-user container preview. This does not publish a cloud service.
+services:
+  ml-closure:
+    platform: linux/amd64
+    build:
+      context: ..
+      dockerfile: Dockerfile
+    ports:
+      - "127.0.0.1:7860:7860"
+    environment:
+      HOST: "0.0.0.0"
+      PORT: "7860"
+    cpus: 2
+    mem_limit: 2g
+    shm_size: 256m
+    init: true
