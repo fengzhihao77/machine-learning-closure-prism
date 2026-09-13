@@ -1,4 +1,4 @@
-/* Frontend only. The protected Flask routes and scientific computation are unchanged. */
+/* Presentation and isolated-run transport. Scientific computation is unchanged. */
 (() => {
   'use strict';
 
@@ -31,6 +31,7 @@
   let timer = null;
   let busy = false;
   let activeModelRun = null;
+  let activeJob = null;
   let modelStatus = null;
   let completedRows = null;
 
@@ -234,6 +235,46 @@
     renderModelStatus();
   }
 
+  function validateJobURLs(payload) {
+    if (!payload || typeof payload !== 'object') throw new Error('The calculation service returned an invalid run.');
+    const names = ['predict_url', 'output_base', 'log_url'];
+    const urls = Object.fromEntries(names.map((name) => {
+      if (typeof payload[name] !== 'string') throw new Error('The calculation service did not provide an isolated run.');
+      const url = new URL(payload[name], location.href);
+      if (url.origin !== location.origin || url.username || url.password || url.href !== url.origin + url.pathname) {
+        throw new Error('The calculation service returned an unexpected run address.');
+      }
+      return [name, url];
+    }));
+    const match = /^\/api\/runs\/([A-Za-z0-9_-]{43})\/predict$/.exec(urls.predict_url.pathname);
+    if (!match || urls.output_base.pathname !== `/api/runs/${match[1]}/files/` ||
+        urls.log_url.pathname !== `/api/runs/${match[1]}/terminal.log`) {
+      throw new Error('The calculation addresses do not belong to the same isolated run.');
+    }
+    return Object.freeze({ predictURL: urls.predict_url.href, outputBase: urls.output_base.href, logURL: urls.log_url.href });
+  }
+  function requireResponseURL(response, expected) {
+    if (response.url !== expected || response.redirected) {
+      throw new Error('The calculation service returned a response from an unexpected address. No output has been used.');
+    }
+  }
+  function serviceError(status) {
+    if (status === 409) return Object.assign(new Error('Another calculation is running on the shared server. No calculation was started for this request. Please try again when the server is free.'), { serverBusy: true });
+    if (status === 429) return new Error('The shared server has reached its temporary run limit. Please try again later.');
+    if (status === 410) return new Error('This calculation has expired from the server. Please submit the state point again.');
+    return new Error(`The calculation service returned HTTP ${status}. Please try again later.`);
+  }
+  async function allocateJob() {
+    const url = new URL('/api/runs', location.href).href;
+    const response = await fetch(url, { method: 'POST', credentials: 'same-origin', cache: 'no-store', redirect: 'error', headers: { Accept: 'application/json' } });
+    requireResponseURL(response, url);
+    if (!response.ok) throw serviceError(response.status);
+    if ((response.headers.get('content-type') || '').split(';')[0].trim().toLowerCase() !== 'application/json') {
+      throw new Error('The isolated calculation service is unavailable. Reload this page or try again later.');
+    }
+    return validateJobURLs(await response.json());
+  }
+
   function validateData(text) {
     const lines = text.trim().split(/\r?\n/);
     const expected = ['r_range', 'g_r', 'k_range', 'h_k', 'w_k', 'c_k', 's_k'];
@@ -249,7 +290,8 @@
     }
     return rows.length;
   }
-  async function retrieveOutputs() {
+  async function retrieveOutputs(job) {
+    if (!job || job !== activeJob) throw new Error('This calculation is no longer active. No output has been used.');
     app.dataset.state = 'retrieving';
     byId('result-badge').textContent = 'Retrieving results';
     byId('working-title').textContent = 'Preparing your results';
@@ -257,13 +299,12 @@
     byId('status-message').textContent = 'The calculation returned. Retrieving all result files…';
     renderModelStatus();
     const keys = [...Object.keys(plots), 'data'];
-    const token = `${Date.now()}-${Math.random().toString(36).slice(2)}`;
     const blobs = await Promise.all(keys.map(async (key) => {
       const filename = key === 'data' ? 'pred_data.txt' : `${key}.png`;
-      const url = new URL(app.dataset.outputBase + filename, location.href);
-      url.searchParams.set('run', token);
-      const response = await fetch(url, { cache: 'no-store', credentials: 'same-origin' });
-      if (!response.ok) throw new Error(`The calculation returned, but ${filename} could not be retrieved (HTTP ${response.status}). Check the local application's output before running again.`);
+      const url = new URL(filename, job.outputBase).href;
+      const response = await fetch(url, { cache: 'no-store', credentials: 'same-origin', redirect: 'error' });
+      requireResponseURL(response, url);
+      if (!response.ok) throw new Error(`The calculation returned, but ${filename} could not be retrieved (HTTP ${response.status}). No other calculation's output has been used.`);
       const blob = await response.blob();
       if (key !== 'data') {
         const bytes = new Uint8Array(await blob.slice(0, 8).arrayBuffer());
@@ -272,6 +313,7 @@
       }
       return blob;
     }));
+    if (job !== activeJob) throw new Error('This calculation is no longer active. No output has been used.');
     const dataText = await blobs[keys.indexOf('data')].text();
     const rows = validateData(dataText);
     const nextURLs = Object.fromEntries(keys.map((key, index) => [key, URL.createObjectURL(blobs[index])]));
@@ -345,52 +387,65 @@
     storageWrite('ml-closure-inputs', values);
     clearOutputs();
     activeModelRun = null;
+    activeJob = null;
     modelStatus = null;
     completedRows = null;
+    const statusAPI = window.MLClosureModelStatus;
+    statusAPI?.reset();
     setBusy(true);
     app.dataset.state = 'preparing';
     byId('model-run-summary').hidden = true;
     byId('result-badge').textContent = 'Preparing';
     byId('working-title').textContent = 'Preparing your calculation';
-    byId('working-description').textContent = 'Connecting to the local application.';
+    byId('working-description').textContent = 'Creating a separate run for your results.';
     byId('elapsed-time').textContent = '00:00';
     byId('status-message').textContent = 'Preparing the calculation…';
-    const statusAPI = window.MLClosureModelStatus;
-    if (statusAPI) {
-      try {
-        activeModelRun = await statusAPI.prepare();
-        modelStatus = statusAPI.snapshot();
-      } catch (_) { /* Optional terminal capture must not block the solver. */ }
-    }
-    app.dataset.state = 'calculating';
-    startTime();
-    byId('result-badge').textContent = 'Calculating';
-    byId('working-title').textContent = 'Calculating your state point';
-    byId('working-description').textContent = 'The closure is solving. Results will appear here.';
-    byId('figure-context').textContent = 'A new calculation is in progress';
-    byId('figure-metadata').textContent = parameterText(submitted);
-    byId('run-parameters').textContent = `Submitted: ${parameterText(submitted)}`;
-    byId('status-message').textContent = 'Calculating. Keep this tab open; this can take a few minutes.';
-    renderModelStatus();
     try {
+      const job = await allocateJob();
+      activeJob = job;
+      if (statusAPI) {
+        try {
+          activeModelRun = await statusAPI.prepare(job.logURL);
+          modelStatus = statusAPI.snapshot();
+        } catch (_) { /* Missing terminal capture never redirects to another run. */ }
+      }
+      app.dataset.state = 'calculating';
+      startTime();
+      byId('result-badge').textContent = 'Calculating';
+      byId('working-title').textContent = 'Calculating your state point';
+      byId('working-description').textContent = 'The closure is solving. Results will appear here.';
+      byId('figure-context').textContent = 'A new calculation is in progress';
+      byId('figure-metadata').textContent = parameterText(submitted);
+      byId('run-parameters').textContent = `Submitted: ${parameterText(submitted)}`;
+      byId('status-message').textContent = 'Calculating. Keep this tab open; this can take a few minutes.';
+      renderModelStatus();
       let response, responseText;
       try {
         if (activeModelRun) statusAPI.begin(activeModelRun);
-        response = await fetch(form.action, { method: 'POST', body, credentials: 'same-origin' });
+        response = await fetch(job.predictURL, { method: 'POST', body, credentials: 'same-origin', redirect: 'error' });
         // Streaming headers can arrive while the solver is still running.
         // Keep current-run model tracking active until the response body ends.
         responseText = await response.text();
       } catch (_) {
-        throw new Error('The connection to the local application was interrupted. The calculation may still be running. Check the application before submitting again.');
+        throw new Error('The connection to the calculation service was interrupted. Your calculation may still be running. Check its live terminal before trying again.');
       } finally {
         if (activeModelRun) statusAPI.complete(activeModelRun).catch(() => {});
       }
-      if (!response.ok) throw new Error(`The application returned HTTP ${response.status}. This state point may not have converged, or the local application encountered an error. Check its output before trying another calculation.`);
+      requireResponseURL(response, job.predictURL);
+      if (!response.ok) throw serviceError(response.status);
       const returnedHTML = new DOMParser().parseFromString(responseText, 'text/html');
       if (!returnedHTML.querySelector('[data-ml-app][data-server-success="true"]')) throw new Error('The application did not confirm a completed calculation. No previous output has been used for this attempt.');
-      await retrieveOutputs();
+      await retrieveOutputs(job);
     } catch (error) {
-      fail(error.message || 'The result files could not be retrieved. Check the local application before trying again.');
+      if (error.serverBusy) {
+        activeModelRun = null;
+        activeJob = null;
+        modelStatus = null;
+        statusAPI?.reset();
+        fail(error.message, 'The shared server is busy.');
+        byId('result-badge').textContent = 'Server busy';
+        byId('status-message').textContent = 'Server busy. No calculation was started for this request. Please try again shortly.';
+      } else fail(error.message || 'The result files could not be retrieved. Please try again later.');
     }
   });
 
@@ -442,20 +497,13 @@
     document.documentElement.classList.add('motion-enabled');
   }
 
-  if (app.dataset.serverSuccess === 'true') {
-    // Native POST fallback: server-returned values are authoritative, never browser storage.
-    submitted = inputValues();
-    setBusy(true);
-    startTime();
-    retrieveOutputs().catch((error) => fail(error.message));
-  } else {
-    const saved = storageRead('ml-closure-inputs');
-    if (saved && typeof saved === 'object') fields.forEach((name) => {
-      const field = form.elements.namedItem(name);
-      if (!field.value && typeof saved[name] === 'string') field.value = saved[name];
-    });
-    clearOutputs();
-    setBusy(false);
-    app.dataset.state = 'ready';
-  }
+  // A new page never restores server-wide outputs or an unbound native POST.
+  const saved = storageRead('ml-closure-inputs');
+  if (saved && typeof saved === 'object') fields.forEach((name) => {
+    const field = form.elements.namedItem(name);
+    if (!field.value && typeof saved[name] === 'string') field.value = saved[name];
+  });
+  clearOutputs();
+  setBusy(false);
+  app.dataset.state = 'ready';
 })();

@@ -117,7 +117,7 @@ while time.monotonic() < deadline:
             # Recheck ownership after HTTP in case the process exited meanwhile.
             current = listeners()
             if healthy and owned_process(pid) and current and current <= process_sockets(pid):
-                print(f"ML Closure is ready on private forwarded port {port}.")
+                print(f"ML Closure is ready on forwarded port {port}.")
                 break
         except (OSError, ValueError):
             pass
