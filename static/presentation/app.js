@@ -373,17 +373,20 @@
     byId('status-message').textContent = 'Calculating. Keep this tab open; this can take a few minutes.';
     renderModelStatus();
     try {
-      let response;
+      let response, responseText;
       try {
         if (activeModelRun) statusAPI.begin(activeModelRun);
         response = await fetch(form.action, { method: 'POST', body, credentials: 'same-origin' });
+        // Streaming headers can arrive while the solver is still running.
+        // Keep current-run model tracking active until the response body ends.
+        responseText = await response.text();
       } catch (_) {
         throw new Error('The connection to the local application was interrupted. The calculation may still be running. Check the application before submitting again.');
       } finally {
         if (activeModelRun) statusAPI.complete(activeModelRun).catch(() => {});
       }
       if (!response.ok) throw new Error(`The application returned HTTP ${response.status}. This state point may not have converged, or the local application encountered an error. Check its output before trying another calculation.`);
-      const returnedHTML = new DOMParser().parseFromString(await response.text(), 'text/html');
+      const returnedHTML = new DOMParser().parseFromString(responseText, 'text/html');
       if (!returnedHTML.querySelector('[data-ml-app][data-server-success="true"]')) throw new Error('The application did not confirm a completed calculation. No previous output has been used for this attempt.');
       await retrieveOutputs();
     } catch (error) {
