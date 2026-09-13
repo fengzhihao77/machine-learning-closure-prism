@@ -1,0 +1,52 @@
+<svg xmlns="http://www.w3.org/2000/svg" class="ml-flow-svg" viewBox="0 0 1600 730" width="1600" height="730" role="img" aria-labelledby="ml-flow-title ml-flow-desc" style="display:block;width:100%;height:auto;color:var(--ink,#252821)">
+<title id="ml-flow-title">Self-consistent ML–PRISM numerical solution</title>
+<desc id="ml-flow-desc">Initialize h0(k)=1. QHO encode h_i(k) into lowercase Latin w and coefficients C_q. The machine learning closure, conditioned on N, epsilon and rho, predicts w and C_q for c_i(k). QHO decode the prediction. PRISM gives h_i(k)=c_i(k)_pred omega(k)^2 divided by 1 minus rho c_i(k)_pred omega(k). The indirect correlation gamma_i(k)=h_i(k) minus c_i(k)_pred. Compare the mean squared difference in gamma to the previous iteration. Export if tol is less than or equal to 10 to the minus 4; otherwise update h and gamma and repeat. Greek omega denotes the intramolecular correlation and is distinct from Latin w.</desc>
+<style>
+.ml-flow-svg text{font-family:Arial,Helvetica,sans-serif;fill:var(--ink,#252821)}
+.ml-flow-svg .flow-math{font-family:Georgia,'Times New Roman',serif;font-style:italic}
+.ml-flow-svg .flow-link{fill:none;stroke:currentColor;stroke-width:2.5;stroke-linejoin:round}
+.ml-flow-svg .flow-accent{fill:var(--gold-deep,#765d27)}
+.ml-flow-svg .flow-bracket{fill:none;stroke:currentColor;stroke-width:2.5}
+</style>
+<defs><marker id="ml-flow-arrow" viewBox="0 0 10 10" refX="9" refY="5" markerWidth="7" markerHeight="7" orient="auto"><path d="M0 0 10 5 0 10Z" fill="currentColor"/></marker></defs>
+
+<text x="16" y="89" font-size="31" text-anchor="start" class="flow-math">h<tspan baseline-shift="sub" font-size="65%">0</tspan>(k) = 1</text>
+<path d="M176 80H554" class="flow-link" marker-end="url(#ml-flow-arrow)"/>
+<text x="352" y="34" font-size="27" text-anchor="middle" class="">QHO</text>
+<text x="352" y="63" font-size="27" text-anchor="middle" class="">Encode</text>
+<rect x="500" y="35" width="365" height="312" fill="var(--gold-soft,#e9dfc3)" stroke="var(--gold-deep,#765d27)" stroke-width="2.5" stroke-dasharray="10 8"/>
+<path d="M500 80H554" class="flow-link" marker-end="url(#ml-flow-arrow)"/>
+<text x="693" y="90" font-size="28" text-anchor="middle" class="flow-math">[w, C<tspan baseline-shift="sub" font-size="65%">q</tspan>] of h<tspan baseline-shift="sub" font-size="65%">i</tspan>(k)</text>
+<path d="M694 118V264" class="flow-link" marker-end="url(#ml-flow-arrow)"/>
+<text x="389" y="188" font-size="29" text-anchor="middle" class="flow-math">[N, ε, ρ]</text>
+<path d="M474 181H694" class="flow-link"/>
+<text x="780" y="185" font-size="31" text-anchor="middle" class="">ML</text>
+<text x="780" y="220" font-size="27" text-anchor="middle" class="">Closure</text>
+<text x="679" y="305" font-size="26" text-anchor="middle" class="flow-math">[w, C<tspan baseline-shift="sub" font-size="65%">q</tspan>]<tspan baseline-shift="sub" font-size="65%">pred</tspan> of c<tspan baseline-shift="sub" font-size="65%">i</tspan>(k)</text>
+<path d="M846 295H940V80H1200" class="flow-link" marker-end="url(#ml-flow-arrow)"/>
+<text x="1044" y="32" font-size="27" text-anchor="middle" class="">QHO</text>
+<text x="1044" y="62" font-size="27" text-anchor="middle" class="">Decode</text>
+<text x="1314" y="89" font-size="32" text-anchor="middle" class="flow-math">c<tspan baseline-shift="sub" font-size="65%">i</tspan>(k)<tspan baseline-shift="sub" font-size="65%">pred</tspan></text>
+<path d="M1325 121V170" class="flow-link" marker-end="url(#ml-flow-arrow)"/>
+<path d="M1040 172Q1005 172 1005 179V365Q1005 372 1040 372M1554 172Q1588 172 1588 179V365Q1588 372 1554 372" class="flow-bracket"/>
+<text x="1032" y="250" font-size="29" text-anchor="start" class="flow-math">h<tspan baseline-shift="sub" font-size="65%">i</tspan>(k) =</text>
+<text x="1370" y="213" font-size="29" text-anchor="middle" class="flow-math">c<tspan baseline-shift="sub" font-size="65%">i</tspan>(k)<tspan baseline-shift="sub" font-size="65%">pred</tspan> · ω<tspan baseline-shift="super" font-size="65%">2</tspan>(k)</text>
+<path d="M1164 235H1570" stroke="currentColor" stroke-width="2.5"/>
+<text x="1367" y="271" font-size="28" text-anchor="middle" class="flow-math">1 − ρ · c<tspan baseline-shift="sub" font-size="65%">i</tspan>(k)<tspan baseline-shift="sub" font-size="65%">pred</tspan> · ω(k)</text>
+<text x="1297" y="335" font-size="31" text-anchor="middle" class="flow-math">γ<tspan baseline-shift="sub" font-size="65%">i</tspan>(k) = h<tspan baseline-shift="sub" font-size="65%">i</tspan>(k) − c<tspan baseline-shift="sub" font-size="65%">i</tspan>(k)<tspan baseline-shift="sub" font-size="65%">pred</tspan></text>
+<path d="M1325 355V512H1020" class="flow-link" marker-end="url(#ml-flow-arrow)"/>
+<text x="496" y="521" font-size="33" text-anchor="start" class="flow-math">tol =</text>
+<text x="624" y="493" font-size="29" text-anchor="middle" class="flow-math">1</text>
+<path d="M603 508H646" stroke="currentColor" stroke-width="2.5"/>
+<text x="624" y="545" font-size="28" text-anchor="middle" class="flow-math">N<tspan baseline-shift="sub" font-size="65%">k</tspan></text>
+<text x="680" y="530" font-size="62" text-anchor="middle" class="flow-math">∑</text>
+<text x="709" y="552" font-size="22" text-anchor="middle" class="flow-math">N<tspan baseline-shift="sub" font-size="65%">k</tspan></text>
+<text x="864" y="522" font-size="30" text-anchor="middle" class="flow-math">[γ<tspan baseline-shift="sub" font-size="65%">i</tspan>(k) − γ<tspan baseline-shift="sub" font-size="65%">i−1</tspan>(k)]<tspan baseline-shift="super" font-size="65%">2</tspan></text>
+<path d="M490 512H272V80" class="flow-link"/>
+<text x="17" y="322" font-size="30" text-anchor="start" class="flow-math">h<tspan baseline-shift="sub" font-size="65%">i</tspan>(k) → h<tspan baseline-shift="sub" font-size="65%">i+1</tspan>(k)</text>
+<text x="17" y="370" font-size="30" text-anchor="start" class="flow-math">γ<tspan baseline-shift="sub" font-size="65%">i</tspan>(k) → γ<tspan baseline-shift="sub" font-size="65%">i+1</tspan>(k)</text>
+<text x="225" y="460" font-size="28" text-anchor="middle" class="">else</text>
+<path d="M779 572V656" class="flow-link" marker-end="url(#ml-flow-arrow)"/>
+<text x="795" y="618" font-size="31" text-anchor="start" class="flow-math">if tol ≤ 10<tspan baseline-shift="super" font-size="65%">−4</tspan></text>
+<text x="779" y="707" font-size="31" text-anchor="middle" class="">Export</text>
+</svg>

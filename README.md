@@ -2,7 +2,7 @@
 
 A local web application for a trained machine learning closure for polymer reference interaction site model (PRISM) integral equation theory. Supply chain length, interaction strength, and number density to calculate correlation functions and a structure factor.
 
-**Candidate version: v1.1.0-rc.1 — private candidate.** The [repository](https://github.com/fengzhihao77/machine-learning-closure-prism) is private and requires access. No public release or hosted demo is available yet. Three original prediction baselines and three browser runs through the redesigned frontend matched exactly. Final presentation review and a replay of saved real output also passed.
+**Candidate version: v1.1.0-rc.1 — private candidate.** The [repository](https://github.com/fengzhihao77/machine-learning-closure-prism) is private and requires access. No public release or hosted demo is available yet. The current frontend passed three actual browser runs against saved pre-redesign baselines, with identical numerical outputs and original PNGs. Real terminal messages were visible inline before every calculation completed.
 
 This candidate preserves the existing scientific engine and trained artifacts. Its package metadata version is `1.1.0rc1`; the historical `1.0.5` header inside the engine remains unchanged. See [CHANGELOG.md](CHANGELOG.md) for provenance.
 
@@ -47,36 +47,36 @@ export TF_NUM_INTEROP_THREADS=1
 export PYTHONHASHSEED=20260913
 export PYTHONDONTWRITEBYTECODE=1
 export TF_CPP_MIN_LOG_LEVEL=2
-python ML_closure.py
+python -u ML_closure.py 2>&1 | tee static/pred_results/terminal.log
 ```
 
 Open the local URL printed by Flask, normally [http://127.0.0.1:5000](http://127.0.0.1:5000). Keep the directory layout intact: the engine loads its models and saves results using paths relative to the working directory.
 
 Use one prediction at a time. Each calculation overwrites the same result filenames, so this version is intended for a single local user and is not prepared for concurrent public requests.
 
-To show real terminal output in the interface's **Calculation log** window, launch with output capture instead of the plain Python command above:
+The launch command captures real stdout/stderr while keeping it visible in the launching terminal. A **Python terminal** panel appears automatically during calculation and shows the latest 60 captured lines without opening a popup. **Live terminal** opens the larger log window with up to 500 lines. The inline feed keeps updating when that window closes and retains its final captured output after the run.
 
-```bash
-python -u ML_closure.py 2>&1 | tee static/pred_results/terminal.log
-```
-
-The existing Flask static route serves this generated log; no scientific code or route is modified. The popup reads actual stdout/stderr while open and hides its own log-viewer HTTP requests. It displays output from the whole local process, which may include previous calculations. Without this optional capture, it clearly shows browser events instead. Terminal logs and generated predictions are ignored by Git. Keep this single-user local configuration private.
+The existing Flask static route serves the generated log; no scientific code or route is modified. The viewer hides its own log requests and labels capture or connection failures explicitly. Output belongs to the whole local process and may include previous calculations. Existing engine messages report loading, model convergence, and exports; the disabled iteration-residual print statement is not enabled by this frontend. Running `python ML_closure.py` without capture leaves the inline feed unavailable and the popup clearly labeled as browser events. Terminal logs and generated predictions are ignored by Git. Keep this single-user local configuration private.
 
 ## Regression checks
 
+The current inline-terminal, standard-plot, and diagram refinements passed the full three-state regression on September 13, 2026.
+
 Three state points were selected before execution with Python's `random.Random(20260913)`: independent draws of integer `N` in [20, 100], uniform `epsilon` in [0, 0.5], and uniform `rho` in [0.2, 0.8], with the latter two rounded to three decimals.
 
-| Case | N | epsilon | rho | Original complete check time (s) |
-| --- | --- | --- | --- | --- |
-| 1 | 32 | 0.311 | 0.671 | 74.62 |
-| 2 | 49 | 0.407 | 0.701 | 65.30 |
-| 3 | 67 | 0.188 | 0.399 | 24.21 |
+| Case | N | epsilon | rho | Original complete check (s) | Current browser check (s) |
+| --- | --- | --- | --- | --- | --- |
+| 1 | 32 | 0.311 | 0.671 | 74.62 | 64.0 |
+| 2 | 49 | 0.407 | 0.701 | 65.30 | 65.1 |
+| 3 | 67 | 0.188 | 0.399 | 24.21 | 26.38 |
 
-All three original cases completed successfully, with all five ensemble folds converged and finite 2,048 × 7 exported arrays. After the latest frontend revision, these same three states were submitted through the actual browser interface again. All **43,008 numeric values** matched the frozen references exactly, and all **15 original engine PNGs** matched byte-for-byte and pixel-for-pixel. Ordered form inputs, retained values, completed data downloads, original-plot access, and the new SVGs' source samples/current-view downloads were checked. Actual engine terminal messages appeared before each calculation completed. The combined numerical/source/browser audit passed **304 of 304 checks**.
+These are observed wall times for the complete checks, not a performance benchmark or evidence of a speed improvement.
 
-Independent saved-data tests passed **525/525** checks of the paper-style renderer, including every source sample and plotted coordinate. Fixture-based interface checks passed **56/56**; these cover the UI without claiming additional model runs. After the real calculations, a one-line log-window close guard fixed a rapid reopen race and passed **21/21** focused terminal-viewer checks. It does not change the request, numerical output, or plot-rendering code.
+All three cases completed with all five ensemble folds converged and finite 2,048 × 7 exported arrays. All **43,008 numeric values** matched the frozen references exactly, with zero maximum absolute difference. All **15 original engine PNGs** matched byte-for-byte and pixel-for-pixel. Ordered inputs, retained values, completed numeric downloads, all 15 SVG source/sample records and current-figure downloads, and the original c(k) uncertainty download were checked. Actual engine terminal messages appeared in the inline panel, without opening the modal, before each calculation completed. The combined numerical/source/browser audit passed **304/304 checks**.
 
-Scientific source and model hashes remain unchanged, as do all 32 files in the original author reference app. This evidence covers the listed regression cases and presentation checks in the recorded environment. See [VALIDATION.md](VALIDATION.md) for details. Saved output fixtures and detailed logs remain in the local review archive.
+The unchanged paper-style renderer retains its **525/525** independent saved-data checks, including every source sample and plotted coordinate. Current fixture-based UI checks passed **63/63**, with **20/20** final layout checks. Focused terminal checks passed **42/42**, and independent diagram checks passed **21/21**. These presentation checks do not claim additional model runs.
+
+Scientific source, models, scalers, predictor, and original dependency pins remain unchanged. A broader preservation check also found no changed bytes or filesystem modification times among 702 source files, including the original reference application and author materials. This evidence covers the three listed regression cases in the recorded environment, not new scientific accuracy or concurrent-hosting claims. See [VALIDATION.md](VALIDATION.md) for the baseline procedure, earlier check history, environment, and scope. Saved outputs and detailed current audit records remain in the local review archive.
 
 ## Inputs and results
 
@@ -102,9 +102,9 @@ Successful calculations write five PNG plots and `pred_data.txt` under `static/p
 
 Numeric rows are whitespace-delimited even though the comment header contains commas. Load them with `numpy.loadtxt`, not a comma-delimited CSV reader. The `w_k` field denotes PRISM ω(k), distinct from the QHO frequency w in the manuscript. Save results elsewhere before starting another calculation.
 
-The default **Paper style** view draws these exact samples in the browser, following manuscript Figures 3–5: boxed axes, inward ticks, and a red ML curve. It applies no smoothing, resampling, or unit conversion. The state point appears in the figure toolbar, and the current view downloads as SVG with source-data provenance. **Original engine** displays and downloads the unchanged PNG. The c(k) paper view shows the mean only because per-fold uncertainty is absent from the numerical table; the original PNG retains its uncertainty band. The complete numerical download remains unchanged.
+The standard scientific view draws these exact samples in the browser, following manuscript Figures 3–5: boxed axes, inward ticks, and a red ML curve. It applies no smoothing, resampling, or unit conversion. The state point appears in the figure toolbar, and the current figure downloads as SVG with source-data provenance. The c(k) view shows the mean only because per-fold uncertainty is absent from the numerical table. The data-details panel provides a separate download of the original c(k) PNG with its uncertainty band. The engine continues to export all five original PNGs, and the complete numerical download remains unchanged.
 
-Three selectable animations illustrate self-consistency, correlation exchange, or activity. They can be previewed before a run and do not represent measured iteration counts, residuals, or completion percentages. Manuscript Figures 1 and 2 are displayed as exact copies, with full-resolution viewing.
+Three selectable animations illustrate self-consistency, correlation exchange, or activity. They can be previewed before a run and do not represent measured iteration counts, residuals, or completion percentages. Manuscript-derived inline vector diagrams explain the architecture and PRISM workflow. These are presentation recreations of the manuscript equations, labels, and flow; the author’s original figures remain unchanged.
 
 ## Development and provenance
 

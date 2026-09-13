@@ -11,6 +11,7 @@
   const tabs = [...app.querySelectorAll('[data-plot]')];
   const dataLink = byId('download-data');
   const figureLink = byId('download-figure');
+  const uncertaintyLink = byId('download-original-ck');
   const dialog = byId('figure-dialog');
   const fields = ['N', 'epsilon', 'rho'];
   const plots = {
@@ -23,10 +24,8 @@
   let outputURLs = {};
   let selectedPlot = 'g_r';
   let paperPlots = null;
-  let preferredStyle = 'paper';
   let plotStyle = 'paper';
   let renderWarning = '';
-  const styleButtons = [...app.querySelectorAll('[data-plot-style]')];
   let submitted = null;
   let started = 0;
   let timer = null;
@@ -59,10 +58,6 @@
     }
   }
   function updateStyleControls() {
-    styleButtons.forEach((button) => {
-      button.setAttribute('aria-pressed', String(button.dataset.plotStyle === plotStyle));
-      button.disabled = busy || !outputURLs[selectedPlot] || (button.dataset.plotStyle === 'paper' && !paperPlots);
-    });
     app.dataset.plotStyle = plotStyle;
   }
   function setPlot(key) {
@@ -101,6 +96,7 @@
     app.dataset.sourceHash = '';
     setLink(dataLink, null);
     setLink(figureLink, null);
+    setLink(uncertaintyLink, null);
     setPlot('g_r');
   }
   function setBusy(value) {
@@ -217,10 +213,11 @@
     outputURLs = nextURLs;
     paperPlots = nextPaperPlots;
     renderWarning = nextRenderWarning;
-    plotStyle = paperPlots ? preferredStyle : 'original';
+    plotStyle = paperPlots ? 'paper' : 'original';
     app.dataset.sourceHash = paperPlots?.sourceHash || '';
     setPlot('g_r');
     setLink(dataLink, outputURLs.data, `${filenamePrefix()}_data.txt`);
+    setLink(uncertaintyLink, outputURLs.c_k, `${filenamePrefix()}_c_k_with_uncertainty.png`);
     stopTime();
     setBusy(false);
     byId('result-badge').textContent = 'Calculation complete';
@@ -233,7 +230,7 @@
   form.addEventListener('invalid', (event) => {
     event.target.setAttribute('aria-invalid', 'true');
     byId('error-title').textContent = 'Check your state point.';
-    byId('error-detail').textContent = 'Use a whole-number chain length from 20 to 100, an interaction strength from 0 to 0.5, and a number density from 0.2 to 0.8.';
+    byId('error-detail').textContent = 'Use an integer chain length from 20 to 100, an interaction strength from 0 to 0.5, and a number density from 0.2 to 0.8.';
     byId('prediction-error').hidden = false;
   }, true);
   fields.forEach((name) => {
@@ -278,13 +275,6 @@
       fail(error.message || 'The result files could not be retrieved. Check the local application before trying again.');
     }
   });
-
-  styleButtons.forEach((button) => button.addEventListener('click', () => {
-    if (busy || !outputURLs[selectedPlot] || (button.dataset.plotStyle === 'paper' && !paperPlots)) return;
-    preferredStyle = button.dataset.plotStyle;
-    plotStyle = preferredStyle;
-    setPlot(selectedPlot);
-  }));
 
   tabs.forEach((tab, index) => {
     tab.addEventListener('click', () => setPlot(tab.dataset.plot));

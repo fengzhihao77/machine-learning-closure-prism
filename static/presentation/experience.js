@@ -48,19 +48,6 @@
   }
   wireDialog('animation-dialog', 'preview-convergence', 'close-animation');
   wireDialog('log-dialog', 'open-log', 'close-log');
-  wireDialog('manuscript-dialog', null, 'close-manuscript');
-  document.querySelectorAll('[data-manuscript-figure]').forEach((link) => {
-    link.addEventListener('click', (event) => {
-      if (event.button !== 0 || event.ctrlKey || event.metaKey || event.shiftKey || event.altKey || !byId('manuscript-dialog')) return;
-      event.preventDefault();
-      byId('manuscript-expanded-image').src = link.href;
-      byId('manuscript-expanded-image').alt = link.querySelector('img').alt;
-      byId('manuscript-dialog-title').textContent = link.dataset.figureTitle;
-      byId('manuscript-original-link').href = link.href;
-      byId('manuscript-dialog').showModal();
-    });
-  });
-
   // These events describe what the browser actually observed, never inferred solver iterations.
   let eventSource = 'browser';
   const events = [];
@@ -88,6 +75,7 @@
     const calculating = state === 'calculating';
     const busy = calculating || state === 'retrieving';
     if (byId('preview-convergence')) byId('preview-convergence').disabled = busy;
+    if (byId('inline-terminal')) byId('inline-terminal').hidden = state === 'ready';
     if (byId('calculation-visual')) byId('calculation-visual').classList.toggle('animation-paused', !calculating);
     if (byId('conceptual-note')) byId('conceptual-note').textContent = state === 'retrieving' ? 'The calculation returned. Saved output files are being retrieved.' : 'Conceptual animation; its timing is independent of the solver.';
     if (state === lastState) return;
@@ -118,6 +106,7 @@
       const target = document.getElementById(link.hash.slice(1));
       if (!target) return;
       event.preventDefault();
+      if (link.hash === '#method' && byId('method-details')) byId('method-details').open = true;
       stopScroll();
       const start = window.scrollY;
       const header = document.querySelector('.site-header').getBoundingClientRect().height;
