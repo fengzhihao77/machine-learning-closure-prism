@@ -2,9 +2,9 @@
 
 An open-source, interactive Predictor for polymer structure using a machine learning closure for PRISM integral equation theory.
 
-## [Run the Predictor online](https://mybinder.org/v2/gh/fengzhihao77/machine-learning-closure-prism/dc077983e02724e0e1c1f8450bb5124244086e26?urlpath=predictor%2F)
+## [Run the Predictor online](https://mybinder.org/v2/gh/fengzhihao77/machine-learning-closure-prism/v1.0.6?urlpath=predictor%2F)
 
-**Version: 1.0.6-rc.1** · [MIT license](LICENSE).
+**Version: 1.0.6** · [MIT license](LICENSE).
 
 Binder opens a free, temporary Predictor session for you, with no installation or GitHub sign-in. Startup can take a few minutes. Enter a state point and run one calculation at a time; keep the tab open while it runs.
 
@@ -30,7 +30,7 @@ Numerical results can vary across operating systems and processors. Use the reco
 
 ## Citation
 
-[Paper](https://arxiv.org/abs/2509.11030) · [Software citation](CITATION.cff).
+[Preprint (arXiv v4)](https://arxiv.org/abs/2509.11030v4) · [Software citation](CITATION.cff).
 
 ## History
 

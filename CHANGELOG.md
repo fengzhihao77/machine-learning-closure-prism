@@ -1,6 +1,6 @@
 # Changelog
 
-## 1.0.6-rc.1
+## 1.0.6
 
 Redesigned the frontend.
 
